@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-sample-app
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: kube-sample-app
+  template:
+    metadata:
+      labels:
+        app: kube-sample-app
+    spec:
+      containers:
+      - name: kube-sample-app
+        image: ${ユーザ名}/kube-sample-app:0.2
+        command:
+        ports:
+        - containerPort: 8080

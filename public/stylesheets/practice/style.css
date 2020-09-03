@@ -1,0 +1,24 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.startExplanation {
+  font-size: 32px;
+  color: red;
+}
+.targetArea {
+  font-size: 32px;
+}
+
+.result {
+  display: none;
+}
+
+.showTime {
+  display:none;
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>E-Learning w/ Typing Training</title>
+    <link rel="stylesheet" href="/stylesheets/practice/style.css">
+    <script type="text/javascript" src="/javascripts/practice/javascript.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+  </head>
+  <body>
+    <h1>自分好みのタイピング練習教材を作ろう！</h1>
+    <p class="targetArea">ここに単語が表示されます.</p>
+    <p class="startExplanation">-spaceキーを押してスタート-</p>
+    <p class="hiddenArea" hidden></p>
+    <ul id="hiddenArray" hidden>
+      <% words.forEach((word) => { %>
+        <li><%= word.name %></li>
+      <% }) %>
+    </ul>
+    <div class="result">
+      <p>結果:</p>
+      <p>クリアタイプ数:<span class="clearType"></span></p>
+      <p>ミスタイプ数:<span class="misType"></span></p>
+      <p>クリアタイプ率:<span class="rate"></span>%</p>
+      <p>経過時間:<span class="time"></span>秒</p>
+    </div>
+    <div class="showTime">
+      <p><span class="passTime"></span>秒<p>
+    </div>
+    <p>escキーで再開</p>
+  </body>
+</html>

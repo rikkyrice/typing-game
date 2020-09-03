@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>E-Learning w/ Typing Training</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script type="text/javascript" src="/javascripts/javascript.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="contanier-header">
+        <h1 class="container-header">新しい単語帳の作成</h1>
+      </div>
+      <div class="item-form-wrapper">
+        <form action="/create" method="post">
+          <p class="form-title">タイトル</p>
+          <input type="text" name="wordsTitle" class="input-title">
+          <p class="form-list-title">単語リスト</p>
+          <ul class="form-lists">
+            <li class="form-list">
+              <input type="text" name="wordsList[]" class="input-list">
+              <button type="button" class="remove-button" onClick="remove_list(this)">- 削除</button>
+            </li>
+          </ul>
+          <input type="submit" value="作成する">
+          <button type="button" class="add-button" onClick="add_list()">+ 追加する</button>
+        </form>
+      </div>
+      <a href="/" class="cancel-button">もどる</a>
+    </div>
+
+  </body>
+</html>

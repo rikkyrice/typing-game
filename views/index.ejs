@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>E-Learning w/ Typing Training</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script type="text/javascript" src="/javascripts/javascript.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="contanier-header">
+        <h1 class="container-header">単語帳リスト</h1>
+      </div>
+      <div class="item-form-wrapper">
+        <ul>
+          <% wordsList.forEach((list) => { %>
+            <li class="wordlist">
+              <a href='/show/<%= list.id %>' class="show-wordlist"><%= list.title %></a>
+              <a href='/practice/<%= list.id %>' class="start-button">開始</a>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+      <a href="/" class="cancel-button">もどる</a>
+    </div>
+  </body>
+</html>
