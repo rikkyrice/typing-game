@@ -45,6 +45,7 @@ app.post('/edit/:id/update', top.update);
 app.post('/delete/:id', top.delete);
 app.get('/practice/:id', top.practice);
 
+// 8080ポートで開く
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
