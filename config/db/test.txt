@@ -1,0 +1,4 @@
+./sql/score.sql
+./sql/user.sql
+./sql/word.sql
+./sql/wordlist.sql

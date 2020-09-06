@@ -1,0 +1,3 @@
+USERNAME=riku
+PASSWORD=241828iqS
+DATABASE=typing_game
