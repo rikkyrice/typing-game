@@ -21,12 +21,12 @@ exports.index = function(req, res){
 
 exports.show = function(req, res){
   connection.query(
-    'SELECT * FROM wordsList WHERE id = ?',
+    'SELECT * FROM wordList WHERE id = ?',
     [req.params.id],
     (error, results) => {
       var wordsName = results[0].title;
       connection.query(
-        'SELECT * FROM words WHERE listID = ?',
+        'SELECT * FROM word WHERE listID = ?',
         [req.params.id],
         (error, results) => {
           res.render('show.ejs', {name: wordsName, words: results});
@@ -43,14 +43,14 @@ exports.new = function(req, res){
 exports.create = function(req, res){
   var listID = null;
   connection.query(
-    'INSERT INTO wordsList (title) VALUES (?)',
+    'INSERT INTO wordList (title) VALUES (?)',
     [req.body.wordsTitle],
     (error, results) => {
       listID = results.insertId;
 
       req.body.wordsList.forEach((list) => {
         connection.query(
-          'INSERT INTO words (name, listID) VALUES (?, ?)',
+          'INSERT INTO word (word, wordlistID) VALUES (?, ?)',
           [list, listID]
         );
       });
@@ -62,12 +62,12 @@ exports.create = function(req, res){
 
 exports.edit = function(req, res){
   connection.query(
-    'SELECT * FROM wordsList WHERE id = ?',
+    'SELECT * FROM wordList WHERE id = ?',
     [req.params.id],
     (error, results) => {
       var wordsName = results[0].title;
       connection.query(
-        'SELECT * FROM words WHERE listID = ?',
+        'SELECT * FROM word WHERE listID = ?',
         [req.params.id],
         (error, results) => {
           res.render('edit.ejs', {name: wordsName, words: results});
@@ -87,7 +87,7 @@ exports.delete = function(req, res){
 
 exports.practice = function(req, res){
   connection.query(
-    'SELECT name FROM words WHERE listID = ?',
+    'SELECT name FROM word WHERE wordlistID = ?',
     [req.params.id],
     (error, results) => {
       res.render('practice.ejs', {words: results});
