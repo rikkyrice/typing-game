@@ -91,3 +91,12 @@ image::usecase-diagram.jpg[ユースケース図]
 単語作成確認画面:: 実際にページをめくったりして単語帳の確認をし、完了ボタンを押す
 フッター画面:: 全てのページの下部に表示されるフッター部分。何を含めるかは謎。
 
+=== 論理設計
+
+image::logicaldesign-diagram.jpg[論理設計]
+
+== 内部設計
+
+=== 物理設計
+
+image::physicaldesign-diagram.jpg[物理設計]
