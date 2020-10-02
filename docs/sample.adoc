@@ -1,0 +1,40 @@
+:lang: ja
+:doctype: book
+:toc: left
+:toclevels: 4
+:toc-title: 目次
+:sectnums:
+:sectnumlevels: 4
+:imagesdir: images
+:figure-caption: 図
+:docname: = アプリケーション
+:author: rikkyrice
+:revnumber: 0.1
+:revdate: 2020/10/05
+
+= アプリケーション
+
+== 概要
+
+シンプルなアプリケーション
+
+== 要件定義
+
+=== ユースケース一覧
+. 非会員
+
++++ <details><summary> +++ 
+check
++++ </summary><div> +++
+----
+include::usecases/UC3_001_非会員は会員登録をする.adoc[]
+----
++++ </div></details> +++
+. 会員
+[arabic]
+.. 会員はログインをする
+.. 会員はログアウトをする
+.. 会員は退会する
+
+=== ユースケース図
+image::usecase-diagram.drawio.svg[format=svg]

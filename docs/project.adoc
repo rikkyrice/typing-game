@@ -1,14 +1,13 @@
 :lang: ja
 :doctype: book
 :toc: left
-:toclevels: 3
+:toclevels: 4
 :toc-title: 目次
 :sectnums:
 :sectnumlevels: 4
 :sectlinks:
 :imagesdir: images
 :icons: font
-:source-highlighter: coderay
 :example-caption: 例
 :table-caption: 表
 :figure-caption: 図
@@ -104,6 +103,7 @@ node app.js
 自分のローカルリポジトリに保存して編集などし、自分好みに編集することができる。
 保存した単語帳は編集することはできるが、自分のものとして公開することはできない。
 
+[[usecase_list]]
 ==== ユースケース一覧
 
 非会員は会員登録をする:: 会員でないユーザーは会員登録をして単語帳作成などのサービスの利用を受けることができる
@@ -131,7 +131,9 @@ docs/usecases
 
 ==== ユースケース図
 
-image::usecase-diagram.jpg[ユースケース図]
+image::usecase-diagram.drawio.svg[format=svg]
+
+// image::usecase-diagram.jpg[ユースケース図]
 
 == 外部設計
 
