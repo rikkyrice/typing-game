@@ -1,4 +1,10 @@
-./sql/score.sql
-./sql/user.sql
-./sql/word.sql
-./sql/wordlist.sql
+./sql/users_create.sql
+./sql/wordlists_create.sql
+./sql/words_create.sql
+./sql/scores_create.sql
+
+
+./sql/users_insert.sql
+./sql/wordlists_insert.sql
+./sql/words_insert.sql
+./sql/scores_insert.sql
