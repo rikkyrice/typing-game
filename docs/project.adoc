@@ -162,10 +162,23 @@ image::usecase-diagram.drawio.svg[format=svg]
 
 === 論理設計
 
-image::logicaldesign-diagram.jpg[論理設計]
+image::logicaldesign-diagram.drawio.svg[format=svg]
 
 == 内部設計
 
 === 物理設計
 
-image::physicaldesign-diagram.jpg[物理設計]
+image::physicaldesign-diagram.drawio.svg[format=svg]
+
+=== データベース定義
+Users::
+include::data_definition/Users.adoc[]
+
+WordLists::
+include::data_definition/WordLists.adoc[]
+
+Words::
+include::data_definition/Words.adoc[]
+
+Scores::
+include::data_definition/Scores.adoc[]
