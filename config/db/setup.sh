@@ -2,7 +2,7 @@
 
 . ./conf.txt
 
-find ./sql -name '*.sql' | sort > test.txt
+find ./sql -name '*.sql'
 
 #上記4
 cat test.txt |\

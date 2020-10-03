@@ -10,6 +10,6 @@ CREATE TABLE Scores (
     played_at DATETIME NOT NULL,
 
     FOREIGN KEY (word_list_id) REFERENCES WordLists(id)
+        ON DELETE CASCADE
         ON UPDATE NO ACTION
-        ON DELETE cascade
 );

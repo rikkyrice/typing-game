@@ -10,6 +10,6 @@ CREATE TABLE Words (
     updated_at TIMESTAMP NOT NULL,
 
     FOREIGN KEY (word_list_id) REFERENCES WordLists(id)
+        ON DELETE CASCADE
         ON UPDATE NO ACTION
-        ON DELETE cascade
 );

@@ -9,6 +9,6 @@ CREATE TABLE WordLists (
     updated_at TIMESTAMP NOT NULL,
 
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
+        ON DELETE CASCADE
         ON UPDATE NO ACTION
-        ON DELETE cascade
 );
