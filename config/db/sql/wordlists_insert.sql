@@ -1,0 +1,2 @@
+INSERT INTO WordLists VALUE(0, "rikkyrice", "TOEIC", "TOEICの頻出単語を単語帳にしました！ぜひ使って990点めざしましょう！", "2020-10-03 21:50:00", "2020-10-03 21:50:00");
+INSERT INTO WordLists VALUE(1, "rikkyrice", "OpenShift CLI", "OpenShiftのCLIタイピングゲームです。CLIを効率的に覚えましょう！", "2020-10-04 12:20:00", "2020-10-04 12:20:00")

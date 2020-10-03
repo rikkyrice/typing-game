@@ -32,11 +32,11 @@
 |20
 |好きな文字列
 
-|作成日時
+|作成日
 |created_at
 |Y
 |
-|TIMESTAMP
+|DATE
 |
-|YYYY-MM-DD HH:MM:SS
+|YYYY-MM-DD
 |===

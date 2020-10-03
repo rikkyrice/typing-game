@@ -1,0 +1,1 @@
+INSERT INTO Users VALUE("rikky", "rikkyrice@gmail.com", "241828iqS", "2020-10-03")

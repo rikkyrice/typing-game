@@ -28,7 +28,7 @@
 |play_count
 |Y
 |
-|Integer
+|INTEGER
 |4
 |カウントしていきます。
 

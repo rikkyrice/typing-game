@@ -32,6 +32,14 @@
 |60
 |好きなタイトル
 
+|説明
+|explanation
+|
+|
+|VARCHAR
+|300
+|説明
+
 |作成日時
 |created_at
 |Y

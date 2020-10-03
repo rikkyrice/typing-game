@@ -1,9 +1,0 @@
-DROP TABLE IF EXISTS WordList;
-
-CREATE TABLE WordList (
-    ID INT AUTO_INCREMENT PRIMARY KEY, 
-    UserID INT NOT NULL,
-    Title VARCHAR(50) NOT NULL, 
-    Created_by INT NOT NULL,
-    Created_at DATETIME NOT NULL
-);
