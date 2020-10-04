@@ -187,7 +187,7 @@ image::sequence/SQ1_001_非会員は会員登録をする.drawio.svg[format=svg]
 
 * 会員はログインをする
 
-GET /users/{user_id}
+POST /users/{user_id}
 
 image::sequence/SQ1_101_会員はログインをする.drawio.svg[format=svg]
 
@@ -270,7 +270,7 @@ GET /scores/{word_list_id}
 === API定義
 
 Users::
-* GET /users/{user_id}
+* POST /users/login
 * POST /users
 
 WordLists::

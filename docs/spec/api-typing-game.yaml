@@ -1,0 +1,326 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Learning w/ Typing Training
+  description: タイピングゲームで使うAPIを定義する。
+servers:
+  - url: http://localhost:8080/
+tags:
+  - name: Users
+    description: ユーザー関連の処理
+  - name: WordLists
+    description: 単語帳関連の処理
+  - name: Words
+    description: 単語関連の処理
+  - name: Scores
+    description: スコア関連の処理
+paths:
+  /users:
+    post:
+      tags:
+        - Users
+      summary:  ユーザー登録
+      description: ユーザー登録の処理を行う
+      parameters:
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - mail
+                - password
+                - created_at
+              properties:
+                user_id:
+                  type: string
+                  description: ユーザーID
+                  example: "rikky"
+                mail:
+                  type: string
+                  description: メールアドレス
+                  example: "rikkyrice@gmail.com"
+                password:
+                  type: string
+                  description: パスワード
+                  example: "rikkyrice"
+                created_at:
+                  type: date
+                  description: 作成日
+                  example: "2020-10-04 23:18:00"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostUsers'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+  /users/login:
+    post:
+      tags:
+        - Users
+      summary:  ユーザーログイン
+      description: ユーザーログインの処理を行う
+      parameters:
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - password
+              properties:
+                user_id:
+                  type: string
+                  description: ユーザーID
+                  example: "rikky"
+                password:
+                  type: string
+                  description: パスワード
+                  example: "rikkyrice"
+  /wordlists:
+    post:
+      tags:
+        - WordLists
+      summary: 単語帳を作成
+      description: 単語帳の作成をする
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - word_list_title
+                - explanation
+                - created_at
+                - updated_at
+              properties:
+                user_id:
+                  type: string
+                  description: ユーザーID
+                  example: "rikky"
+                word_list_title:
+                  type: string
+                  description: 単語帳名
+                  example: "TOEIC"
+                explanation:
+                  type: string
+                  description: 説明
+                  example:
+                created_at:
+                  type: timestamp
+                  description: 作成日時
+                  example: "2020-10-04 23:18:00"
+                updated_at:
+                  type: timestamp
+                  description: 更新日時
+                  example: "2020-10-04 23:19:00"
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostWordLists'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+components:
+  schemas:
+    PostUsers:
+      type: object
+      required:
+        - user_id
+        - mail
+        - password
+        - created_at
+      properties:
+        user_id:
+          type: string
+          description: ユーザーID
+          example: "rikky"
+        mail:
+          type: string
+          description: メールアドレス
+          example: "rikkyrice@gmail.com"
+        password:
+          type: string
+          description: パスワード
+          example: "rikkyrice"
+        created_at:
+          type: date
+          description: 作成日
+          example: "2020-10-04 23:18:00"
+    LoginUsers:
+      type: object
+      required:
+        - token
+        - user_id
+      properties:
+        token:
+          type: string
+          description: アクセストークン
+          example: ""
+        user_id:
+          type: string
+          description: ユーザーID
+          example: "rikky"
+    PostWordLists:
+      type: object
+      required:
+        - word_list_id
+        - user_id
+        - word_list_title
+        - explanation
+        - created_at
+        - updated_at
+      properties:
+        word_lsit_id:
+          type: integer
+          description: 単語帳ID
+          example: 0
+        user_id:
+          type: string
+          description: ユーザーID
+          example: "rikky"
+        word_list_title:
+          type: string
+          description: 単語帳名
+          example: "TOEIC"
+        explanation:
+          type: string
+          description: 説明
+          example:
+        created_at:
+          type: timestamp
+          description: 作成日時
+          example: "2020-10-04 23:18:00"
+        updated_at:
+          type: timestamp
+          description: 更新日時
+          example: "2020-10-04 23:19:00"
+    APIError:
+      type: object
+      required:
+        - code
+        - message
+        - errors
+      properties:
+        code:
+          description: エラーコード
+          type: string
+        message:
+          description: エラー概要の説明
+          type: string
+        errors:
+          description: エラーが原因が入力値不正の場合、この項目に値が入る。
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                description: 不正と判断された項目
+                type: string
+              code:
+                description: 不正と判断された理由コード
+                type: string
+              message:
+                description: 不正と判断された理由の説明
+                type: string
+  errors:
+    BadRequestError:
+      code: "400"
+      message: "入力値が不正です。"
+      errors: 
+        - field: "password"
+          code: "NOT_EMPTY"
+          message: "この項目には有効な値が必要です。nullや空文字は許容されません。"
+    InternalServerError:
+      code: "500"
+      message: "予期しないエラーが発生しました。"
+      errors: []
