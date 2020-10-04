@@ -126,6 +126,29 @@ paths:
                   type: string
                   description: パスワード
                   example: "rikkyrice"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginUsers'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
   /wordlists:
     post:
       tags:
@@ -189,7 +212,7 @@ paths:
                   example: "2020-10-04 23:19:00"
       responses:
         '200':
-          description: Created
+          description: OK
           content:
             application/json:
               schema:
@@ -245,7 +268,7 @@ components:
         token:
           type: string
           description: アクセストークン
-          example: ""
+          example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
         user_id:
           type: string
           description: ユーザーID
