@@ -181,9 +181,13 @@ include::data_definition/Scores.adoc[]
 
 * 非会員は会員登録をする
 
+POST /users
+
 image::sequence/SQ1_001_非会員は会員登録をする.drawio.svg[format=svg]
 
 * 会員はログインをする
+
+GET /users/{user_id}
 
 image::sequence/SQ1_101_会員はログインをする.drawio.svg[format=svg]
 
@@ -193,53 +197,97 @@ image::sequence/SQ1_101_会員はログインをする.drawio.svg[format=svg]
 
 * 会員は退会をする
 
+DELETE /users/{user_id}
+
 image::sequence/SQ1_103_会員は退会をする.drawio.svg[format=svg]
 
 * 会員は単語帳の一覧が確認できる
+
+GET /wordlists/{user_id} +
+GET /scores/{word_list_id}/latest
 
 image::sequence/SQ1_111_会員は単語帳の一覧が確認できる.drawio.svg[format=svg]
 
 * 会員は単語の一覧が確認できる
 
+GET /words/{word_list_id}
+
 image::sequence/SQ1_112_会員は単語の一覧が確認できる.drawio.svg[format=svg]
 
 * 会員は単語を確認できる
 
-モーダルでの確認となるので、単語UIで完結
+GET /words/{word_id}
+
+image::sequence/SQ1_113_会員は単語を確認できる.drawio.svg[format=svg]
 
 * 会員は単語帳を作成できる
+
+POST /wordlists +
+POST /scores +
+POST /words
 
 image::sequence/SQ1_114_会員は単語帳を作成できる.drawio.svg[format=svg]
 
 * 会員は単語とその単語の意味を追加できる
 
-上記、会員は単語帳を作成できるに含まれる
+単語帳を作成できるのうちに含まれる
 
-* 会員は随時追加した単語の編集ができる
+* 会員は単語帳を編集する
 
-上記、会員は単語帳を作成できるに含まれる
+PUT /wordlists/{word_list_id} +
+POST /words +
+PUT /words/{word_id} +
+DELETE /words/{word_id}
 
-* 会員は随意時追加した単語の削除ができる
-
-上記、会員は単語帳を作成できるに含まれる
-
-* 会員は単語帳
-を編集できる
-
-以下は全部一つのシーケンス。
-単語の削除とかも、完了する時に全部追加は追加のjson
-編集は編集のjson
-削除は削除のjsonを作って、APIをたたく。
-全部完了したら201 OK
-
-* 会員は単語の追加ができる
-
-* 会員は単語の編集ができる
-
-* 会員は単語の削除ができる
+image::sequence/SQ1_116_会員は単語帳を編集する.drawio.svg[format=svg]
 
 * 会員は単語帳の削除ができる
 
+DELETE /scores/{word_list_id} +
+DELETE /words/{word_list_id} +
+DELETE /wordlists/{word_list_id}
+
+image::sequence/SQ1_117_会員は単語帳の削除ができる.drawio.svg[format=svg]
+
+* 会員は単語を個別に編集、削除できる
+
+PUT /words/{word_id} +
+DELETE /words/{word_id}
+
+image::sequence/SQ1_118_会員は単語を個別に編集、削除できる.drawio.svg[format=svg]
+
 * 会員はタイピングゲームを行う
 
+GET /words/{word_list_id} +
+POST /scores/{word_list_id}
+
+image::sequence/SQ1_121_会員はタイピングゲームを行う.drawio.svg[format=svg]
+
 * 会員はスコアを確認する
+
+GET /scores/{word_list_id}
+
+=== API定義
+
+Users::
+* GET /users/{user_id}
+* POST /users
+
+WordLists::
+* GET /wordlists/{user_id}
+* POST /wordlists
+* PUT /wordlists/{word_list_id}
+* DELETE /wordlists/{word_list_id}
+
+Words::
+* GET /words/{word_list_id}
+* GET /words/{word_id}
+* POST /words
+* PUT /words/{word_id}
+* DELETE /words/{word_id}
+
+Scores::
+* GET /scores/{word_list_id}
+* GET /scores/{word_list_id}/latest
+* POST /scores
+* DELETE /scores/{word_list_id}
