@@ -212,11 +212,727 @@ paths:
                   example: "2020-10-04 23:19:00"
       responses:
         '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostWordList'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+  /wordlists/{user_id}:
+    get:
+      tags:
+        - WordLists
+      summary: 単語帳を表示
+      description: 単語帳を取得する。
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: user_id
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: "rikky"
+      responses:
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostWordLists'
+                $ref: '#/components/schemas/GetWordLists'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+  /wordlists/{word_list_id}:
+    put:
+      tags:
+        - WordLists
+      summary: 単語帳を更新
+      description: 単語帳を更新する。
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: word_list_id
+          description: 単語帳ID
+          required: true
+          schema:
+            type: integer
+            example: 0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - word_list_title
+                - explanation
+                - updated_at
+              properties:
+                word_list_title:
+                  type: string
+                  description: 単語帳名
+                  example: "TOEIC"
+                explanation:
+                  type: string
+                  description: 説明
+                  example:
+                updated_at:
+                  type: timestamp
+                  description: 更新日時
+                  example: "2020-10-04 23:19:00"
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutWordList'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+    delete:
+      tags:
+        - WordLists
+      summary: 単語帳を削除
+      description: 単語帳を削除する
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: word_list_id
+          description: 単語帳ID
+          required: true
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+  /words:
+    post:
+      tags:
+        - Words
+      summary: 単語を作成
+      description: 単語の作成をする
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - words
+              properties:
+                words:
+                  type: array
+                  description: 単語
+                  items:
+                    $ref: '#/components/schemas/Word'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostWords'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+  /words/{word_list_id}:
+    get:
+      tags:
+        - Words
+      summary: 単語のリスト
+      description: 単語のリストを取得
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: word_list_id
+          description: 単語帳ID
+          required: true
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWords'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+  /words/{word_id}:
+    get:
+      tags:
+        - Words
+      summary: 単語
+      description: 単語を取得
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: word_id
+          description: 単語ID
+          required: true
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWord'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+    put:
+      tags:
+        - Words
+      summary: 単語
+      description: 単語を更新
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: word_id
+          description: 単語ID
+          required: true
+          schema:
+            type: integer
+            example: 0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - word
+                - meaning
+                - explanation
+                - updated_at
+              properties:
+                word:
+                  type: string
+                  description: 単語名
+                  example: "organization"
+                meaning:
+                  type: string
+                  description: 意味
+                  example: 
+                explanation:
+                  type: string
+                  description: 説明
+                  example:
+                updated_at:
+                  type: timestamp
+                  description: 更新日時
+                  example: "2020-10-04 23:19:00"
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutWord'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+    delete:
+      tags:
+        - Words
+      summary: 単語を削除
+      description: 単語を削除する
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: word_id
+          description: 単語ID
+          required: true
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+  /scores:
+    post:
+      tags:
+        - Scores
+      summary: スコアを作成
+      description: スコアの作成をする
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Score'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostScore'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+  /scores/{word_list_id}:
+    get:
+      tags:
+        - Scores
+      summary: スコアのリスト
+      description: スコアのリストを取得
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: word_list_id
+          description: 単語帳ID
+          required: true
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetScores'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+    delete:
+      tags:
+        - Scores
+      summary: スコアを削除
+      description: スコアを削除する
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: word_list_id
+          description: 単語帳ID
+          required: true
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
+  /scores/{word_list_id}/latest:
+    get:
+      tags:
+        - Scores
+      summary: スコア
+      description: スコアを取得
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: word_list_id
+          description: 単語帳ID
+          required: true
+          schema:
+            type: integer
+            example: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetScore'
         '400':
           description: 入力値フォーマット不正
           content:
@@ -273,7 +989,7 @@ components:
           type: string
           description: ユーザーID
           example: "rikky"
-    PostWordLists:
+    PostWordList:
       type: object
       required:
         - word_list_id
@@ -283,7 +999,7 @@ components:
         - created_at
         - updated_at
       properties:
-        word_lsit_id:
+        word_list_id:
           type: integer
           description: 単語帳ID
           example: 0
@@ -306,6 +1022,206 @@ components:
         updated_at:
           type: timestamp
           description: 更新日時
+          example: "2020-10-04 23:19:00"
+    GetWordLists:
+      type: object
+      required:
+        - matched
+        - wordLists
+      properties:
+        matched:
+          type: integer
+          description: 作成した単語帳の数
+          example: 1
+        wordLists:
+          type: array
+          description: 単語帳
+          items:
+            $ref: '#/components/schemas/WordList'
+    WordList:
+      type: object
+      required:
+        - word_list_id
+        - user_id
+        - word_list_title
+        - explanation
+        - created_at
+        - updated_at
+      properties:
+        word_list_id:
+          type: integer
+          description: 単語帳ID
+          example: 0
+        user_id:
+          type: string
+          description: ユーザーID
+          example: "rikky"
+        word_list_title:
+          type: string
+          description: 単語帳名
+          example: "TOEIC"
+        explanation:
+          type: string
+          description: 説明
+          example:
+        created_at:
+          type: timestamp
+          description: 作成日時
+          example: "2020-10-04 23:18:00"
+        updated_at:
+          type: timestamp
+          description: 更新日時
+          example: "2020-10-04 23:19:00"
+    PutWordList:
+      type: object
+      required:
+        - word_list_title
+        - explanation
+      properties:
+        word_list_title:
+          type: string
+          description: 単語帳名
+          example: "TOEIC"
+        explanation:
+          type: string
+          description: 説明
+          example:
+    PostWords:
+      type: object
+      required:
+        - words
+      properties:
+        words:
+          type: array
+          description: 単語
+          items:
+            $ref: '#/components/schemas/Word'
+    GetWords:
+      type: object
+      required:
+        - words
+      properties:
+        words:
+          type: array
+          description: 単語
+          items:
+            $ref: '#/components/schemas/Word'
+    GetWord:
+      $ref: '#/components/schemas/Word'
+    PutWord:
+      type: object
+      required:
+        - word_list_title
+        - explanation
+      properties:
+        word:
+          type: string
+          description: 単語名
+          example: "organization"
+        meaning:
+          type: string
+          description: 意味
+          example:
+        explanation:
+          type: string
+          description: 説明
+          example:
+    Word:
+      type: object
+      required:
+        - word_id
+        - word_list_id
+        - word
+        - meaning
+        - explanation
+        - created_at
+        - updated_at
+      properties:
+        word_id:
+          type: integer
+          description: 単語ID
+          example: 0
+        word_list_id:
+          type: integer
+          description: 単語帳ID
+          example: 0
+        word:
+          type: string
+          description: 単語
+          example: "organization"
+        meaning:
+          type: string
+          description: 意味
+          example:
+        explanation:
+          type: string
+          description: 説明
+          example:
+        created_at:
+          type: timestamp
+          description: 作成日時
+          example: "2020-10-04 23:18:00"
+        updated_at:
+          type: timestamp
+          description: 更新日時
+          example: "2020-10-04 23:19:00"
+    PostScore:
+      $ref: '#/components/schemas/Score'
+    GetScores:
+      type: object
+      required:
+        - matched
+        - scores
+      properties:
+        matched:
+          type: integer
+          description: スコアの数
+          example: 2
+        scores:
+          type: array
+          description: スコア
+          items:
+            $ref: '#/components/schemas/Score'
+    GetScore:
+      $ref: '#/components/schemas/Score'
+    Score:
+      type: object
+      required:
+        - score_id
+        - word_list_id
+        - play_count
+        - clear_type_count
+        - miss_type_count
+        - correct_rate
+        - played_at
+      properties:
+        score_id:
+          type: integer
+          description: スコアID
+          example: 0
+        word_list_id:
+          type: integer
+          description: 単語帳ID
+          example: 0
+        play_count:
+          type: integer
+          description: プレイ回数
+          example: 100
+        clear_type_count:
+          type: integer
+          description: クリアタイプ数
+          example: 200
+        miss_type_count:
+          type: integer
+          description: ミスタイプ数
+          example: 10
+        correct_rate:
+          type: double
+          description: 正誤率
+          example: 80%
+        played_at:
+          type: timestamp
+          description: プレイ日時
           example: "2020-10-04 23:19:00"
     APIError:
       type: object
