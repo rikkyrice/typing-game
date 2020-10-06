@@ -8,7 +8,6 @@
 :sectlinks:
 :imagesdir: images
 :icons: font
-:source-highlighter: coderay
 :example-caption: 例
 :table-caption: 表
 :figure-caption: 図
@@ -60,10 +59,11 @@ a|
 
 == イベントフロー
 === 基本フロー
-. 会員は単語追加ページで追加ボタンを押す
+. 会員は単語帳作成ページで追加ボタンを押す
 . システムは単語追加用の入力フォームをappendする
 . 会員は単語を入力する
 . 会員は単語の意味を入力する
+. 会員は単語の説明を入力する
 . 会員は完了を押下
 . システムは入力チェックを行う[AF1]
 . システムはデータベースに単語を追加する

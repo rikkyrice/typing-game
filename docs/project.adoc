@@ -115,13 +115,9 @@ node app.js
 会員は単語の確認ができる:: ユーザーは自分が作った単語帳の単語の一覧のうち、それぞれの意味などを確認することができる
 会員は単語帳を作成できる:: ユーザーは自分好みの単語帳を自由に作成することができる
 会員は単語とその単語の意味を追加できる:: ユーザーは単語帳のそれぞれの単語について、単語とその単語の意味をそれぞれ追加することができる
-会員は随時追加した単語の編集ができる:: ユーザーは追加した単語やその意味を随時編集することができる
-会員は随時追加した単語の削除ができる:: ユーザーは追加した単語を随時削除することができる
-会員は単語帳のタイトルを編集する:: ユーザーは自分で作った単語帳を編集することができる
-会員は単語の追加ができる:: ユーザーは自分で作成した単語帳に新しく単語を追加することができる
-会員は単語の編集ができる:: ユーザーは自分で作成した単語帳のそれぞれの単語について、その単語と意味を編集することができる
-会員は単語の削除ができる:: ユーザーは自分で作成した単語帳のそれぞれの単語を削除することができる
-会員は単語帳を削除する:: ユーザーは自分の単語帳リポジトリの単語帳を削除することができる
+会員は単語帳を編集する:: ユーザーは自分で作った単語帳を編集することができる
+会員は単語帳の削除ができる:: ユーザーは自分の単語帳リポジトリの単語帳を削除することができる
+会員は単語を個別に編集、削除できる:: ユーザーは自分の単語詳細ページから当該単語の編集と削除ができる
 会員はタイピングゲームを行う:: ユーザーは単語帳リポジトリの単語帳をタイピングゲームすることができる
 会員はスコアを確認する:: ユーザーは自分が行ったタイピングゲームごとのスコアを確認することができる
 
@@ -132,8 +128,6 @@ docs/usecases
 ==== ユースケース図
 
 image::usecase-diagram.drawio.svg[format=svg]
-
-// image::usecase-diagram.jpg[ユースケース図]
 
 == 外部設計
 
@@ -146,9 +140,9 @@ image::usecase-diagram.drawio.svg[format=svg]
 会員登録画面:: 大した情報は必要ない。メアドと名前とパスワードくらい。
 ログイン画面:: 名前とパスワードでログイン
 単語帳ページ:: 自分のローカルリポジトリを表示。単語帳の一覧と、作成、削除ボタンを表示。退会もここで行う。
-単語ページ:: 単語のリストを表示。追加ボタン、削除ボタン、編集ボタンがある。スコアの表示も行う。
-単語帳作成(編集)ページ:: 単語帳のタイトルと説明を入力。
-単語作成(編集)画面:: 単語追加ボタンを押して、単語を入力。Workdayみたいな感じで作る。
+単語ページ:: 単語のリストを表示。編集ボタン、プレイボタンがある。編集を押すと単語帳の編集が視覚的に行えるスコアの表示も行う。
+単語詳細ページ:: 単語の詳細ページを表示する。
+単語帳作成ページ:: 単語帳のタイトルと説明を入力。単語追加ボタンを押して、単語を入力。Workdayみたいな感じで作る。
 タイピングゲーム選択画面:: 練習か本番かを選ぶ画面
 タイピングゲーム練習画面:: 時間無制限で、ひたすら単語を打ち続ける練習ゲーム
 タイピングゲーム画面:: 単語とその意味が段になって表示される。まず単語をタイピングすると、自動的に意味にフォーカスが移る。最終的にスコアが画面に表示される。時間制にしようか。
@@ -157,8 +151,8 @@ image::usecase-diagram.drawio.svg[format=svg]
 
 ログアウトモーダル:: ログアウトのモーダルを表示する。確認用。
 退会用モーダル:: 退会のモーダルを表示する。確認用。
-編集用モーダル:: 単語帳のタイトルと意味を編集する画面。
-単語詳細モーダル:: 単語の詳細モーダルを表示。
+単語帳情報編集用モーダル:: 単語帳のタイトルと意味を編集する画面。
+単語情報編集用モーダル:: 単語の情報を詳細に編集するモーダル。
 
 === 論理設計
 
@@ -182,3 +176,118 @@ include::data_definition/Words.adoc[]
 
 Scores::
 include::data_definition/Scores.adoc[]
+
+=== シーケンス図
+
+* 非会員は会員登録をする
+
+POST /users
+
+image::sequence/SQ1_001_非会員は会員登録をする.drawio.svg[format=svg]
+
+* 会員はログインをする
+
+POST /users/{user_id}
+
+image::sequence/SQ1_101_会員はログインをする.drawio.svg[format=svg]
+
+* 会員はログアウトをする
+
+ログインUI上での処理でOK(ブラウザキャッシュを利用)
+
+* 会員は退会をする
+
+DELETE /users/{user_id}
+
+image::sequence/SQ1_103_会員は退会をする.drawio.svg[format=svg]
+
+* 会員は単語帳の一覧が確認できる
+
+GET /wordlists/{user_id} +
+GET /scores/{word_list_id}/latest
+
+image::sequence/SQ1_111_会員は単語帳の一覧が確認できる.drawio.svg[format=svg]
+
+* 会員は単語の一覧が確認できる
+
+GET /words/{word_list_id}
+
+image::sequence/SQ1_112_会員は単語の一覧が確認できる.drawio.svg[format=svg]
+
+* 会員は単語を確認できる
+
+GET /words/{word_id}
+
+image::sequence/SQ1_113_会員は単語を確認できる.drawio.svg[format=svg]
+
+* 会員は単語帳を作成できる
+
+POST /wordlists +
+POST /scores +
+POST /words
+
+image::sequence/SQ1_114_会員は単語帳を作成できる.drawio.svg[format=svg]
+
+* 会員は単語とその単語の意味を追加できる
+
+単語帳を作成できるのうちに含まれる
+
+* 会員は単語帳を編集する
+
+PUT /wordlists/{word_list_id} +
+POST /words +
+PUT /words/{word_id} +
+DELETE /words/{word_id}
+
+image::sequence/SQ1_116_会員は単語帳を編集する.drawio.svg[format=svg]
+
+* 会員は単語帳の削除ができる
+
+DELETE /scores/{word_list_id} +
+DELETE /words/{word_list_id} +
+DELETE /wordlists/{word_list_id}
+
+image::sequence/SQ1_117_会員は単語帳の削除ができる.drawio.svg[format=svg]
+
+* 会員は単語を個別に編集、削除できる
+
+PUT /words/{word_id} +
+DELETE /words/{word_id}
+
+image::sequence/SQ1_118_会員は単語を個別に編集、削除できる.drawio.svg[format=svg]
+
+* 会員はタイピングゲームを行う
+
+GET /words/{word_list_id} +
+POST /scores/{word_list_id}
+
+image::sequence/SQ1_121_会員はタイピングゲームを行う.drawio.svg[format=svg]
+
+* 会員はスコアを確認する
+
+GET /scores/{word_list_id}
+
+=== API定義
+
+Users::
+* POST /users/login
+* POST /users
+
+WordLists::
+* GET /wordlists/{user_id}
+* POST /wordlists
+* PUT /wordlists/{word_list_id}
+* DELETE /wordlists/{word_list_id}
+
+Words::
+* GET /words/{word_list_id}
+* GET /words/{word_id}
+* POST /words
+* PUT /words/{word_id}
+* DELETE /words/{word_id}
+
+Scores::
+* GET /scores/{word_list_id}
+* GET /scores/{word_list_id}/latest
+* POST /scores
+* DELETE /scores/{word_list_id}
