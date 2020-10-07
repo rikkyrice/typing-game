@@ -1,13 +1,7 @@
 #!/bin/sh
+set -e
+. ./env.list
 
-. ./conf.txt
-
-find ./sql -name '*.sql'
-
-#上記4
-cat test.txt |\
-while read sql
-do
-mysql -u${USERNAME} -p${PASSWORD} --database=${DATABASE} < $sql
-echo $sql;
-done
+# Build Docker image
+docker pull ibmcom/db2:11.5.4.0
+docker build -t ${REPOSITORY}:${TAG} .

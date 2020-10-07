@@ -1,1 +1,0 @@
-docker pull store/ibmcorp/db2wh_ce:v11.5.2.0-db2wh_client-linux
