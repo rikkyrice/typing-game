@@ -89,7 +89,9 @@ MySQL:: ~
 [source, bash]
 ----
 # データベースのセットアップ
-sh config/db/setup.sh
+cd config/db
+bash setup.sh
+bash run.sh
 
 # アプリ立ち上げ
 node app.js
