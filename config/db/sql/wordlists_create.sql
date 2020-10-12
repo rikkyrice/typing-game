@@ -4,7 +4,7 @@ CREATE TABLE WordLists (
     id INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 INCREMENT BY 1), 
     user_id VARCHAR(20) NOT NULL,
     word_list_title VARCHAR(60) NOT NULL,
-    explanation VARCHAR(300), 
+    explanation VARCHAR(1024), 
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     PRIMARY KEY (

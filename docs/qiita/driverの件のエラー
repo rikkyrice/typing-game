@@ -1,0 +1,10 @@
+linux
+linuxx64_odbc_cli.tar.gz
+Downloading https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/linuxx64_odbc_cli.tar.gz
+Error while downloading file: open linuxx64_odbc_cli.tar.gz: permission denied
+exit status 4
+
+chmod 777 installer
+でいける
+
+その後パスを通して終わり。
