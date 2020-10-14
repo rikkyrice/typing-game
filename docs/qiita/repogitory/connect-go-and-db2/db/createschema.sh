@@ -1,5 +1,4 @@
 #!/bin/bash
-
 export PATH=/database/config/db2inst1/sqllib/bin/:$PATH
 
 db2 connect to USERDB user db2inst1 using password

@@ -1,15 +1,15 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"../db"
-
 	"gopkg.in/yaml.v2"
+	"github.com/pkg/errors"
+
+	"local.packages/db"
 )
 
 // Config structure that defines the settings

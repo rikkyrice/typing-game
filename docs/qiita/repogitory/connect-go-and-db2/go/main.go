@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"./config"
-	"./db"
-
 	"github.com/pkg/errors"
+
+	"local.packages/config"
+	"local.packages/db"
 )
 
 // User is users entity
