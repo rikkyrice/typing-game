@@ -25,7 +25,6 @@ Db2コンテナにデータは挿入できたけど、実際にそのデータ�
 
 ## Getting Started
 開発環境はWindowsですが、MacでもLinuxでもできます。
-MacやLinuxの場合はSQLのCLIドライバのパスを通す必要があるので、それに関しては後述します。
 
 今回は、Db2との疎通確認に重きを置いておりますので、API化などは行っていません。
 単純にDb2からデータを取ってきて、コンソールに出力するだけのプログラムを書いていきます。(いつかGoでREST APIの実装も紹介します。)
@@ -36,11 +35,10 @@ MacやLinuxの場合はSQLのCLIドライバのパスを通す必要があるの
 ```bash:project
 project
 ├─go
-|  ├─config
-|  |      ├─env.yaml
-|  |      └─config.go
-|  ├─db
-|  |  └─db.go
+|  ├─model
+|  |     ├─user.go
+|  |     ├─tweet.go
+|  |     └─reply.go
 |  └─main.go
 └─db  
    ├─data
@@ -56,13 +54,13 @@ project
    └─env.list
 ```
 - **/go**
-  - **/config**  
-    - **env.yaml**
-      データベース接続用の情報を格納
-    - **config.go**  
-      データベース接続情報を内部で取り出す構造体を定義
-  - **/db/db.go**  
-    データベースの構造体を定義
+  - **/model**  
+    - **user.go**
+      ユーザーのDTOとDAO
+    - **tweet.go**
+      ツイートのDTOとDAO
+    - **reply.go**  
+      リプライのDTOとDAO
   - **main.go**  
     メインの関数  
 - **/db:** データベースをセットアップするフォルダ
@@ -76,6 +74,8 @@ project
     コンテナ定義
   - **env.list**  
     Db2コンテナ用の構成情報
+
+本当は、ドメイン駆動設計とかで、ユーザードメインとか、インフラストラクチャとか作ってカッコいい設計をしたいんですが、それはまたの機会ということで。
 
 ## 2. コンテナの立ち上げ
 まずは`Dockerfile`を用いて、コンテナイメージをビルドします。
@@ -95,59 +95,76 @@ $ docker run --name go-db --restart=always --detach --privileged=true -p 50000:5
 詳しい説明は[こちら](https://qiita.com/rikkyrice/items/20946fc5b4e2153b0f87)で紹介しています。
 
 ここで大事なのはポートを50000:50000でポートフォワーディングしていることです。
-クライアントに公開している50000ポートはenv.yamlで定義する必要があるので、覚えておきます。
+クライアントに公開している50000ポートはDBと接続する時に指定する必要があるので、覚えておきます。
 
-## 3. Goの実装方針
-main.goでの実行流れは大体以下のようになります。
-
-1. config.goでConfig構造体にenv.yamlの情報を注入したインスタンスを作成。
-2. db.goにConfigインスタンスを渡し、DBとのコネクションを張る。
-3. 張った情報を持つDB構造体のインスタンスを作成
-4. main.go内でDBインスタンスのコネクションを用いてSQL文を発行しデータのやり取りをする。
-
-本当は、ドメイン駆動設計とかで、ユーザードメインとか、インフラストラクチャとか作ってカッコいい設計をしたいんですが、それはまたの機会ということで。
-
-## 4. インポートするパッケージ
+## 3. インポートするパッケージ
 利用するパッケージ
 * github.com/ibmdb/go_ibm_db
 * gopkg.in/yaml.v2
+* github.com/pkg/errors
 
+### 3.1. go_ibm_db
 基本的にGoでDb2を利用する際は、`github.com/ibmdb/go_ibm_db`というパッケージを利用します。
 
-Goをインストールしている方は`GOPATH`が通っているか確認しましょう。
-私のWindowsでは`GOROOT`を`c:/go`に、`GOPATH`を`c:/users/usrname/go`に指定しており、Goのパッケージ関連は全て`GOPATH`である`c:/users/usrname/go`直下に落とされます。
-
-確認の仕方は
-
-```bash
-$ go env
-```
-
-でできます。
-設定していなかったら環境変数の追加などで対応しましょう。
-
-もし余計なパッケージを環境に落としたくないという方は、`go mod`でもできます。
-
-それでは`github.com/ibmdb/go_ibm_db`を落とします。
 以下のコマンドを叩きます。
 
 ```bash
 $ go get github.com/ibmdb/go_ibm_db
 ```
 
+またデータベースを操作するにあたって、SQLを操作するためのドライバが必要になります。
+色々操作があるので順にやります。
+
+まず、落としてきた`github.com/ibmdb/go_ibm_db`を見に行きます。
+おそらく`GOPATH`配下に落とされていると思うので、こちらの階層を下ると、`installer`というフォルダにぶち当たります。
+このフォルダ内`setup.go`がclidriverのダウンロードスクリプトになっています。
+
+```bash
+$ cd PathToInstaller/installer
+$ go run setup.go
+```
+
+これでclidriverが`installer`配下にダウンロードできます。(パーミッションエラーが起きた方は、installerフォルダの権限を変えてみてください。)
+
+無事落とせてこれた方は`PathToInstaller/installer/clidriver/bin`のパスを通す必要があるので、通しましょう。
+これでgo_ibm_dbのセットアップは完了です。
+
+もし余計なパッケージを環境に落としたくないという方は、`go mod`でもできます。
+しかしその場合も、`sqlcli.h`は必要になりますので、インストールしてきたinstallerをプロジェクトにコピーしてきて、、シェルスクリプトなどで、`clidriver/bin`のパスを通し、moduleを指定してビルドすることで実行ファイルを生成できます。
+
+### 3.2. yaml.v2
 また、今回の実装では、yamlファイルから構造体のインスタンスを作る場面が現れるので、`gopkg.in/yaml.v2`も落としてきます。
 
 ```bash
 $ go get gopkg.in/yaml.v2
 ```
 
+### 3.3. errors
+さらにエラーの実装もするので、`errors`パッケージも落としましょう。
 
+```bash
+$ go get github.com/pkg/errors
+```
 
-## 5. Goの実装
+## 4. Goの実装
+基本的に実装は本当に3で紹介した通りです。
+main.goのmain関数を見ながら紹介します。
 
+まずこのコード
 
-## 6. 実行結果
+```go:main.go
+  c, err := config.Init("config/env.yaml")
+	if err != nil {
+		fmt.Printf("設定ファイルの読み込みに失敗しました。%+v", err)
+	}
+```
 
-## 7. Mac, Linuxでの実装
+configパッケージの`Init`関数を呼んでいます。
+この関数は何をするかというと
+`config/env.yaml`の内容を読んできて、それをConfig構造体に落としています。
 
-## 8. まとめ
+## 5. 実行結果
+
+## 6. Mac, Linuxでの実装
+
+## 7. まとめ
