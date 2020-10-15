@@ -100,7 +100,6 @@ $ docker run --name go-db --restart=always --detach --privileged=true -p 50000:5
 ## 3. インポートするパッケージ
 利用するパッケージ
 * github.com/ibmdb/go_ibm_db
-* gopkg.in/yaml.v2
 * github.com/pkg/errors
 
 ### 3.1. go_ibm_db
@@ -125,6 +124,7 @@ $ go run setup.go
 ```
 
 これでclidriverが`installer`配下にダウンロードできます。(パーミッションエラーが起きた方は、installerフォルダの権限を変えてみてください。)
+結構時間がかかる気がします。
 
 無事落とせてこれた方は`PathToInstaller/installer/clidriver/bin`のパスを通す必要があるので、通しましょう。
 これでgo_ibm_dbのセットアップは完了です。
@@ -132,15 +132,8 @@ $ go run setup.go
 もし余計なパッケージを環境に落としたくないという方は、`go mod`でもできます。
 しかしその場合も、`sqlcli.h`は必要になりますので、インストールしてきたinstallerをプロジェクトにコピーしてきて、、シェルスクリプトなどで、`clidriver/bin`のパスを通し、moduleを指定してビルドすることで実行ファイルを生成できます。
 
-### 3.2. yaml.v2
-また、今回の実装では、yamlファイルから構造体のインスタンスを作る場面が現れるので、`gopkg.in/yaml.v2`も落としてきます。
-
-```bash
-$ go get gopkg.in/yaml.v2
-```
-
-### 3.3. errors
-さらにエラーの実装もするので、`errors`パッケージも落としましょう。
+### 3.2. errors
+また、エラーの実装もするので、`errors`パッケージも落としましょう。
 
 ```bash
 $ go get github.com/pkg/errors
@@ -153,18 +146,170 @@ main.goのmain関数を見ながら紹介します。
 まずこのコード
 
 ```go:main.go
-  c, err := config.Init("config/env.yaml")
+  config := "HOSTNAME=localhost;DATABASE=USERDB;PORT=50000;UID=db2inst1;PWD=password"
+	conn, err := sql.Open("go_ibm_db", config)
 	if err != nil {
-		fmt.Printf("設定ファイルの読み込みに失敗しました。%+v", err)
+		fmt.Printf("DBとの接続に失敗しました。%+v", err)
+	}
+	defer conn.Close()
+```
+
+configにDB接続情報を格納します。HOSTNAMEとPORT以外はenv.listに乗せてある情報を使います。
+その下の`sql.Open`でDBとのコネクションを張ります。
+一つ目の引数はドライバ名を指定します。今回は`go_ibm_db`です。
+二つ目の引数はDB接続情報を指定します。エラーを取りうるので、エラー処理もかかせず行います。
+コネクションは必ず終了する必要があるので、Goのプラクティスである`defer`を使ってコネクションを閉じましょう。
+
+これでDb2コンテナとのコネクションが取得できました。
+これを利用してデータを操作していきます。
+
+まずはユーザーを全件取得して、情報をユーザー構造体に格納し、インスタンスの配列を作っています。
+
+```go:main.go
+users, err := model.GetAllUser(conn)
+if err != nil {
+  fmt.Printf("取得に失敗 %+v", err)
+}
+```
+
+ではユーザーDAOとDTOを定義しているuser.goを見ていきます。
+
+```go:user.go
+// User is users entity
+type User struct {
+	id        string
+	name      string
+	mail      string
+	password  string
+	createdAt time.Time
+	updatedAt time.Time
+}
+
+func (u *User) String() string {
+	return fmt.Sprintf(
+		"ユーザー名:%s",
+		u.name,
+	)
+}
+
+// GetID returns user's id
+func (u *User) GetID() string {
+	return u.id
+}
+```
+
+ユーザー構造体はテーブル定義のカラムをフィールドに定義しています。
+GetIDメソッドはユーザーのIDを取得するメソッドです。これは他のテーブルのクエリにIDを渡すためにユーザー構造体のフィールドがプライベートに指定されているため、書いています。
+まぁここら辺は他の言語でも似たようなことやると思います。
+
+その下、ユーザー全件取得メソッドですが、
+
+```go:user.go
+// GetAllUser returns all user instances
+func GetAllUser(conn *sql.DB) ([]User, error) {
+	selectAllUserQuery := `SELECT * FROM users`
+
+	selectAllUserPstmt, err := conn.Prepare(selectAllUserQuery)
+	if err != nil {
+		return []User{}, errors.Wrapf(err, "ステートメントの作成に失敗しました")
+	}
+
+	var users []User
+
+	rows, err := selectAllUserPstmt.Query()
+	if err != nil {
+		return []User{}, errors.Wrap(err, "クエリ実行に失敗")
+	}
+	for rows.Next() {
+		var user User
+		if err := rows.Scan(
+			&user.id,
+			&user.name,
+			&user.mail,
+			&user.password,
+			&user.createdAt,
+			&user.updatedAt,
+		); err != nil {
+			return []User{}, errors.Wrap(err, "結果読み込み失敗")
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+```
+
+ここは色んな書き方があるんですが、Prepare()メソッドでステートメントを用意してから、queryを実行する方法で書きます。
+
+これを実行すると、取れてきたレコードが`rows`に格納されます。
+`rows`はNextメソッドを持っていて、for文でそれぞれのレコードを回すことができます。
+さらに`rows.Scan()`にユーザーインスタンスの情報を渡してあげると、そこにレコードの情報を格納してくれます。
+
+これで、ユーザー情報をユーザーインスタンスに格納することができました。
+ユーザーの配列を返します。
+
+それではmainに戻ります。
+
+次からはユーザーインスタンスからIDを取ってきて、Tweetの`WHERE句`に渡して挙げて、ユーザーに紐づくレコードを取ってきています。
+取ってきたtweetレコードからさらにIDを取ってきて、それに紐づくReplyを取得し出力、それをユーザーレコード分行うといった処理をしています。
+
+```go:main.go
+// 件数少ないので3重for文で。
+	for _, user := range users {
+		fmt.Println(user.String())
+		tweets, err := model.GetAllTweets(conn, user.GetID())
+		if err != nil {
+			fmt.Printf("取得に失敗 %+v", err)
+		}
+		for _, tweet := range tweets {
+			fmt.Println(tweet.String())
+			replys, err := model.GetAllReplys(conn, tweet.GetID())
+			if err != nil {
+				fmt.Printf("取得に失敗", err)
+			}
+			for _, reply := range replys {
+				fmt.Println(reply.String())
+			}
+		}
 	}
 ```
 
-configパッケージの`Init`関数を呼んでいます。
-この関数は何をするかというと
-`config/env.yaml`の内容を読んできて、それをConfig構造体に落としています。
+`WHERE句`にIDを渡すためにはSQL文を`SELECT * FROM Tweets WHERE user_id = ?`のように与えたいパラメータの箇所を`?`とします。
+パラメータ分第2引数を与えることで、`WHERE句`をカスタムできます。
+
+書き方は、
+`rows, err := selectAllTweetPstmt.Query(userID)`
+このような形です。
+
 
 ## 5. 実行結果
+Windowsで実行すると、コンテナから値を受け取ってくる段階で、日本語箇所は文字化けして表示されてしまいます。
+Db2で用いているコンテナがLinuxコンテナなので、文字コードがUTF-8のまま文字列が送られてくることに起因していると思われます。
 
-## 6. Mac, Linuxでの実装
+実行結果は以下のようになります。
 
-## 7. まとめ
+```bash
+ユーザー名:hoge
+ツイート本文:�����̓e�X�g�ł��B, 作成日:2020-10-09 12:00:00 +0900 JST
+リプライユーザー名:fugaaaa, リプライ本文:�e�X�g�m�F���܂����B, 作成日:2020-10-11 12:00:00 +0900 JST
+-----------------------
+ユーザー名:fuga
+ツイート本文:�����̓e�X�g�ł��B, 作成日:2020-10-10 12:00:00 +0900 JST
+リプライユーザー名:hogeeee, リプライ本文:�e�X�g�m�F���܂����B, 作成日:2020-10-11 12:00:00 +0900 JST
+-----------------------
+```
+
+まぁめっちゃ文字化けしてますね。
+悲しいです。
+間違っても、日本語で評価するような構文は避けましょう。
+このままだとあれなんで、Macで実行した結果も載せときます。
+
+```bash
+
+```
+
+こんな感じで、Db2から取得できています。
+
+## 6. まとめ
+文字コードの弊害がありながらも、GoでDb2コンテナに接続する手法を紹介しました。
+
+これでAPI開発とか楽に行えますね。

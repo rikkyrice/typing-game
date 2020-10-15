@@ -36,7 +36,9 @@ func main() {
 			}
 			for _, reply := range replys {
 				fmt.Println(reply.String())
+				fmt.Println(reply.GetBody())
 			}
 		}
+		fmt.Println("-----------------------")
 	}
 }

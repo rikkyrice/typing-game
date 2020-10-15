@@ -19,18 +19,26 @@ type Reply struct {
 
 func (r *Reply) String() string {
 	return fmt.Sprintf(
-		"リプライID:%s, ツイートID:%s, ユーザーID:%s, 本文:%s, 作成日:%s",
-		r.id,
-		r.tweetID,
+		"リプライユーザー名:%s, リプライ本文:%s, 作成日:%s",
 		r.userID,
 		r.body,
 		r.createdAt,
 	)
 }
 
+// GetBody returns user's id
+func (r *Reply) GetBody() string {
+	if r.body == "テスト確認しました。" {
+		return r.body
+	} else {
+		return "まじうんち"
+
+	}
+}
+
 // GetAllReplys returns all reply instances
 func GetAllReplys(conn *sql.DB, tweetID string) ([]Reply, error) {
-	selectAllReplyQuery := `SELECT * FROM Replys WHERE tweet_id = ?`
+	selectAllReplyQuery := "SELECT * FROM Replys WHERE tweet_id = ?"
 
 	selectAllReplyPstmt, err := conn.Prepare(selectAllReplyQuery)
 	if err != nil {

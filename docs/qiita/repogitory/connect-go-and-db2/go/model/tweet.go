@@ -19,12 +19,9 @@ type Tweet struct {
 
 func (t *Tweet) String() string {
 	return fmt.Sprintf(
-		"ツイートID:%s, ユーザーID:%s, 本文:%s, 作成日:%s, 更新日:%s",
-		t.id,
-		t.userID,
+		"ツイート本文:%s, 作成日:%s",
 		t.body,
 		t.createdAt,
-		t.updatedAt,
 	)
 }
 

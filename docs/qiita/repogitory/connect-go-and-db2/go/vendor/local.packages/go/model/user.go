@@ -20,13 +20,8 @@ type User struct {
 
 func (u *User) String() string {
 	return fmt.Sprintf(
-		"ユーザーID:%s, ユーザー名:%s, メールアドレス:%s, パスワード:%s, 作成日:%s, 更新日:%s",
-		u.id,
+		"ユーザー名:%s",
 		u.name,
-		u.mail,
-		u.password,
-		u.createdAt,
-		u.updatedAt,
 	)
 }
 
