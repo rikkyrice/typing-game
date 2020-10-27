@@ -5,9 +5,9 @@ import "time"
 // Score defines score table
 type Score struct {
 	// ID autoincrementされる値
-	ID int
+	ID string
 	// WordListID 単語帳ID
-	WordListID int
+	WordListID string
 	// PlayCount プレイ回数
 	PlayCount int
 	// ClearTypeCount クリアタイプ数

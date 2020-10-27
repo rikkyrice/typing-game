@@ -5,9 +5,9 @@ import "time"
 // Word defines word table
 type Word struct {
 	// ID autoincrementされる値
-	ID int
+	ID string
 	// WordListID 単語帳ID
-	WordListID int
+	WordListID string
 	// word 単語名
 	Word string
 	// Meaning 意味

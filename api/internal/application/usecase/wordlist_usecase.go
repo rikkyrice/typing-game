@@ -11,8 +11,8 @@ import (
 type WordListUseCase interface {
 	GetWordList(userID string) ([]*model.WordList, error)
 	PostWordList(wordlist model.WordList) (*model.WordList, error)
-	PutWordList(id int, wordlist model.WordList) (*model.WordList, error)
-	DeleteWordList(id int) error
+	PutWordList(id string, wordlist model.WordList) (*model.WordList, error)
+	DeleteWordList(id string) error
 }
 
 // NewWordListUseCase 単語帳用サービス生成
@@ -43,7 +43,7 @@ func (wl *wordlistUseCase) PostWordList(wordlist model.WordList) (*model.WordLis
 	return createdWL, nil
 }
 
-func (wl *wordlistUseCase) PutWordList(id int, wordlist model.WordList) (*model.WordList, error) {
+func (wl *wordlistUseCase) PutWordList(id string, wordlist model.WordList) (*model.WordList, error) {
 	updatedWL, err := wl.WordListRepository.UpdateWordListByID(id, wordlist)
 	if err != nil {
 		return nil, errors.Wrap(err, "単語帳の更新に失敗しました。")
@@ -51,7 +51,7 @@ func (wl *wordlistUseCase) PutWordList(id int, wordlist model.WordList) (*model.
 	return updatedWL, nil
 }
 
-func (wl *wordlistUseCase) DeleteWordList(id int) error {
+func (wl *wordlistUseCase) DeleteWordList(id string) error {
 	if err := wl.WordListRepository.RemoveWordListByID(id); err != nil {
 		return errors.Wrap(err, "単語帳の削除に失敗しました。")
 	}

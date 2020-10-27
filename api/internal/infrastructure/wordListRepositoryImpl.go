@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"api/internal/common/util"
 	"api/internal/domain/model"
 	"api/internal/domain/repository"
 	"database/sql"
@@ -26,11 +27,8 @@ const insertWordListQuery string = `
 const updateWordListByIDQuery string = `
 	UPDATE wordlists
 	SET
-		id = ?,
-		user_id = ?,
-		title = ?,
+		word_list_title = ?,
 		explanation = ?,
-		created_at = ?,
 		updated_at = ?
 	WHERE id = ?
 `
@@ -83,13 +81,13 @@ type wordListRepository struct {
 	deleteWordListByIDPstmt     *sql.Stmt
 }
 
-func (wlR *wordListRepository) FindWordListByID(id int) (*model.WordList, error) {
-	var wl *model.WordList
+func (wlR *wordListRepository) FindWordListByID(id string) (*model.WordList, error) {
+	var wl model.WordList
 
-	if err := wlR.selectWordListByIDPstmt.QueryRow(id).Scan(wl.ID, wl.UserID, wl.Title, wl.Explanation, wl.CreatedAt, wl.UpdatedAt); err != nil {
+	if err := wlR.selectWordListByIDPstmt.QueryRow(id).Scan(&wl.ID, &wl.UserID, &wl.Title, &wl.Explanation, &wl.CreatedAt, &wl.UpdatedAt); err != nil {
 		return nil, errors.Wrap(err, "クエリ実行に失敗")
 	}
-	return wl, nil
+	return &wl, nil
 }
 
 func (wlR *wordListRepository) FindWordListByUserID(userID string) ([]*model.WordList, error) {
@@ -99,26 +97,29 @@ func (wlR *wordListRepository) FindWordListByUserID(userID string) ([]*model.Wor
 	if err != nil {
 		return wls, errors.Wrap(err, "クエリ実行に失敗")
 	}
-	defer rows.Close()
 
 	for rows.Next() {
-		var wl *model.WordList
-		if err := rows.Scan(wl.ID, wl.UserID, wl.Title, wl.Explanation, wl.CreatedAt, wl.UpdatedAt); err != nil {
+		var wl model.WordList
+		if err := rows.Scan(&wl.ID, &wl.UserID, &wl.Title, &wl.Explanation, &wl.CreatedAt, &wl.UpdatedAt); err != nil {
 			return nil, errors.Wrap(err, "クエリの読み込みに失敗")
 		}
-		wls = append(wls, wl)
+		wls = append(wls, &wl)
 	}
 
 	return wls, nil
 }
 
 func (wlR *wordListRepository) CreateWordList(wl model.WordList) (*model.WordList, error) {
-	_, err := wlR.insertWordListPstmt.Exec(wl.ID, wl.UserID, wl.Title, wl.Explanation, wl.CreatedAt, wl.UpdatedAt)
+	id, err := util.GenerateUUID()
+	if err != nil {
+		return nil, errors.Wrap(err, "UUIDの生成に失敗しました。")
+	}
+	_, err = wlR.insertWordListPstmt.Exec(id, wl.UserID, wl.Title, wl.Explanation, wl.CreatedAt, wl.UpdatedAt)
 	if err != nil {
 		return nil, errors.Wrap(err, "単語帳の作成に失敗しました。")
 	}
 	return &model.WordList{
-		ID:          wl.ID,
+		ID:          id,
 		UserID:      wl.UserID,
 		Title:       wl.Title,
 		Explanation: wl.Explanation,
@@ -127,13 +128,13 @@ func (wlR *wordListRepository) CreateWordList(wl model.WordList) (*model.WordLis
 	}, err
 }
 
-func (wlR *wordListRepository) UpdateWordListByID(id int, wl model.WordList) (*model.WordList, error) {
-	_, err := wlR.updateWordListByIDPstmt.Exec(wl.ID, wl.UserID, wl.Title, wl.Explanation, wl.CreatedAt, wl.UpdatedAt, id)
+func (wlR *wordListRepository) UpdateWordListByID(id string, wl model.WordList) (*model.WordList, error) {
+	_, err := wlR.updateWordListByIDPstmt.Exec(wl.Title, wl.Explanation, wl.UpdatedAt, id)
 	if err != nil {
 		return nil, errors.Wrap(err, "単語帳の更新に失敗しました。")
 	}
 	return &model.WordList{
-		ID:          wl.ID,
+		ID:          id,
 		UserID:      wl.UserID,
 		Title:       wl.Title,
 		Explanation: wl.Explanation,
@@ -142,7 +143,7 @@ func (wlR *wordListRepository) UpdateWordListByID(id int, wl model.WordList) (*m
 	}, err
 }
 
-func (wlR *wordListRepository) RemoveWordListByID(id int) error {
+func (wlR *wordListRepository) RemoveWordListByID(id string) error {
 	_, err := wlR.deleteWordListByIDPstmt.Exec(id)
 	if err != nil {
 		return errors.Wrap(err, "単語帳の削除にしっぱしました。")

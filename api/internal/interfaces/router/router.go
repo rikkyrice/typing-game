@@ -39,6 +39,9 @@ func (r *Router) Init(rg *registry.Registry) {
 	r.Router.POST(userpath+"/signup", rg.UserH.Signup())
 	r.Router.POST(userpath+"/login", rg.UserH.Login())
 	r.Router.GET(wordlistpath, rg.WordListH.GETWordList())
+	r.Router.POST(wordlistpath, rg.WordListH.POSTWordList())
+	r.Router.PUT(wordlistpath+"/:id", rg.WordListH.PUTWordList())
+	r.Router.DELETE(wordlistpath+"/:id", rg.WordListH.DELETEWordList())
 }
 
 // StartServer サーバーの立ち上げ

@@ -5,7 +5,7 @@ import "time"
 // WordList defines wordList table
 type WordList struct {
 	// ID autoincrementされる値
-	ID int `json:"id" validate:"required"`
+	ID string `json:"id" validate:"required"`
 	// UserID ユーザーID
 	UserID string `json:"userID" validate:"required"`
 	// Title 単語帳名

@@ -28,3 +28,17 @@ func getHeaderParams(c echo.Context) (*headerRequest, error) {
 		UserID: userID,
 	}, nil
 }
+
+type pathRequest struct {
+	ID string
+}
+
+func getPathParams(c echo.Context) (*pathRequest, error) {
+	id := c.Param("id")
+	if id == "" {
+		return nil, apierror.NewError(http.StatusBadRequest, errors.New("パスパラメータに値が含まれていません。"))
+	}
+	return &pathRequest{
+		ID: id,
+	}, nil
+}

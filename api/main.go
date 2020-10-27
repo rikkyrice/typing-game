@@ -9,7 +9,9 @@ import (
 	"api/internal/registry"
 )
 
-// TODO: usecaseはサービスにあたるので一つでいい。なんならパッケージに分ける必要もない。
+// TODO: Db2の日本語化
+// TODO: wordlistをWordListではなくWordlistにリファクタリング
+// TODO: routingリファクタリング
 
 func main() {
 	c, err := config.Init("config/env.yaml")
