@@ -9,6 +9,8 @@ import (
 	"api/internal/registry"
 )
 
+// TODO: usecaseはサービスにあたるので一つでいい。なんならパッケージに分ける必要もない。
+
 func main() {
 	c, err := config.Init("config/env.yaml")
 	if err != nil {

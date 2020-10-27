@@ -3,8 +3,7 @@ package registry
 import (
 	"api/db"
 
-	"api/internal/application/usecase/auth"
-	"api/internal/application/usecase/user"
+	"api/internal/application/usecase"
 	"api/internal/domain/repository"
 	"api/internal/infrastructure"
 	"api/internal/interfaces/handler"
@@ -15,12 +14,13 @@ type Registry struct {
 	TokenR repository.TokenRepository
 	UserR  repository.UserRepository
 
-	AuthUC       auth.AuthUseCase
-	UserSignupUC user.UserSignupUseCase
-	UserLoginUC  user.UserLoginUseCase
+	AuthUC     usecase.AuthUseCase
+	UserUC     usecase.UserUseCase
+	WordListUC usecase.WordListUseCase
 
 	HealthCheckH handler.HealthCheckHandler
 	UserH        handler.UserHandler
+	WordListH    handler.WordListHandler
 }
 
 // NewRegistry レジストリを生成
@@ -33,22 +33,27 @@ func NewRegistry(conn *db.DBConn) *Registry {
 	if err != nil {
 		return nil
 	}
+	wlR, err := infrastructure.NewWordListRepository(conn)
+	if err != nil {
+		return nil
+	}
 
-	aUC := auth.NewAuthUseCase(tR, uR)
-
-	uSUC := user.NewUserSignupUseCase(uR, aUC)
-	uLUC := user.NewUserLoginUseCase(uR, aUC)
+	aUC := usecase.NewAuthUseCase(tR, uR)
+	uUC := usecase.NewUserUseCase(uR, aUC)
+	wlUC := usecase.NewWordListUseCase(wlR)
 
 	hH := handler.NewHealthCheckHandler()
-	uH := handler.NewUserHandler(uSUC, uLUC)
+	uH := handler.NewUserHandler(uUC)
+	wlH := handler.NewWordListHandler(wlUC)
 
 	return &Registry{
 		TokenR:       tR,
 		UserR:        uR,
 		AuthUC:       aUC,
-		UserSignupUC: uSUC,
-		UserLoginUC:  uLUC,
+		UserUC:       uUC,
+		WordListUC:   wlUC,
 		HealthCheckH: hH,
 		UserH:        uH,
+		WordListH:    wlH,
 	}
 }

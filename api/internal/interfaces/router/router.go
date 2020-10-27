@@ -14,6 +14,7 @@ const (
 	basepath        = "/api"
 	healthcheckpath = basepath + "/healthcheck"
 	userpath        = basepath + "/user"
+	wordlistpath    = basepath + "/wordlist"
 )
 
 // Router route
@@ -37,6 +38,7 @@ func (r *Router) Init(rg *registry.Registry) {
 	r.Router.GET(healthcheckpath, rg.HealthCheckH.HealthCheck())
 	r.Router.POST(userpath+"/signup", rg.UserH.Signup())
 	r.Router.POST(userpath+"/login", rg.UserH.Login())
+	r.Router.GET(wordlistpath, rg.WordListH.GETWordList())
 }
 
 // StartServer サーバーの立ち上げ

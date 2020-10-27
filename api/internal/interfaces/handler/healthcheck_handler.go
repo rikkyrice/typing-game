@@ -6,7 +6,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-// /healthcheck
 // HealthCheckHandler ヘルスチェックするAPI
 type HealthCheckHandler interface {
 	HealthCheck() echo.HandlerFunc
@@ -14,6 +13,7 @@ type HealthCheckHandler interface {
 
 type healthCheckHandler struct{}
 
+// NewHealthCheckHandler ヘルスチェック
 func NewHealthCheckHandler() HealthCheckHandler {
 	return &healthCheckHandler{}
 }

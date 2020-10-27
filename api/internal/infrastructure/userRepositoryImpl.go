@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"api/internal/domain/model"
+	"api/internal/domain/repository"
 	"database/sql"
 
 	"api/db"
@@ -18,7 +19,8 @@ const insertUserQuery string = `
 	VALUES(?,?,?,?)
 `
 
-func NewUserRepository(conn *db.DBConn) (*userRepository, error) {
+// NewUserRepository ユーザーリポジトリの生成
+func NewUserRepository(conn *db.DBConn) (repository.UserRepository, error) {
 	errs := []error{}
 
 	selectUserByIDPstmt, err := conn.GetPstmt(selectUserByIDQuery)
@@ -40,7 +42,7 @@ func NewUserRepository(conn *db.DBConn) (*userRepository, error) {
 	}, nil
 }
 
-// UserRepository ユーザーのリポジトリインターフェース
+// userRepository ユーザーのリポジトリインターフェース
 type userRepository struct {
 	selectUserByIDPstmt *sql.Stmt
 	insertUserPstmt     *sql.Stmt

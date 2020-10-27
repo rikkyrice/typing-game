@@ -1,4 +1,4 @@
-package auth
+package usecase
 
 import (
 	"api/internal/common/apierror"
@@ -109,12 +109,10 @@ func parse(signedString string) (*Auth, error) {
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorExpired != 0 {
 				return nil, apierror.NewError(http.StatusUnauthorized, errors.Wrapf(err, "%s is expired", signedString))
-			} else {
-				return nil, apierror.NewError(http.StatusUnauthorized, errors.Wrapf(err, "%s is invalid", signedString))
 			}
-		} else {
 			return nil, apierror.NewError(http.StatusUnauthorized, errors.Wrapf(err, "%s is invalid", signedString))
 		}
+		return nil, apierror.NewError(http.StatusUnauthorized, errors.Wrapf(err, "%s is invalid", signedString))
 	}
 
 	if token == nil {
