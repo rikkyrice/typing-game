@@ -16,6 +16,7 @@ const (
 	userpath        = basepath + "/user"
 	wordlistpath    = basepath + "/wordlist"
 	wordpath        = basepath + "/word"
+	scorepath       = basepath + "/score"
 )
 
 // Router route
@@ -53,6 +54,11 @@ func (r *Router) Init(rg *registry.Registry) {
 	r.Router.PUT(wordpath+"/:id", rg.WordH.PUTWord())
 	r.Router.DELETE(wordpath+"/:id", rg.WordH.DELETEWord())
 	r.Router.DELETE(wordpath+"/wordlist/:id", rg.WordH.DELETEWords())
+
+	r.Router.GET(scorepath+"/:id", rg.ScoreH.GETScores())
+	r.Router.GET(scorepath+"/:id/latest", rg.ScoreH.GETLatestScore())
+	r.Router.POST(scorepath, rg.ScoreH.POSTScore())
+	r.Router.DELETE(scorepath+"/:id", rg.ScoreH.DELETEScores())
 }
 
 // StartServer サーバーの立ち上げ

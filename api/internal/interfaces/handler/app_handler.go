@@ -13,6 +13,7 @@ type AppHandler interface {
 	HealthCheckHandler
 	UserHandler
 	WordListHandler
+	WordHandler
 }
 
 type headerRequest struct {

@@ -81,7 +81,8 @@ func (w *wordHandler) GETWords() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
 		}
 		res := &wordsResponse{
-			Words: words,
+			Matched: len(words),
+			Words:   words,
 		}
 		return c.JSON(http.StatusOK, res)
 	}
