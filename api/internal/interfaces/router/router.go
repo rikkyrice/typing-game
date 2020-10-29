@@ -15,6 +15,7 @@ const (
 	healthcheckpath = basepath + "/healthcheck"
 	userpath        = basepath + "/user"
 	wordlistpath    = basepath + "/wordlist"
+	wordpath        = basepath + "/word"
 )
 
 // Router route
@@ -36,12 +37,22 @@ func (r *Router) Init(rg *registry.Registry) {
 	r.Router.Validator = &validation.CustomValidator{Validator: validator.New()}
 
 	r.Router.GET(healthcheckpath, rg.HealthCheckH.HealthCheck())
+
 	r.Router.POST(userpath+"/signup", rg.UserH.Signup())
 	r.Router.POST(userpath+"/login", rg.UserH.Login())
+
 	r.Router.GET(wordlistpath, rg.WordListH.GETWordList())
 	r.Router.POST(wordlistpath, rg.WordListH.POSTWordList())
 	r.Router.PUT(wordlistpath+"/:id", rg.WordListH.PUTWordList())
 	r.Router.DELETE(wordlistpath+"/:id", rg.WordListH.DELETEWordList())
+
+	r.Router.GET(wordpath+"/:id", rg.WordH.GETWord())
+	r.Router.GET(wordpath+"/wordlist/:id", rg.WordH.GETWords())
+	r.Router.POST(wordpath, rg.WordH.POSTWord())
+	r.Router.POST(wordpath+"/wordlist", rg.WordH.POSTWords())
+	r.Router.PUT(wordpath+"/:id", rg.WordH.PUTWord())
+	r.Router.DELETE(wordpath+"/:id", rg.WordH.DELETEWord())
+	r.Router.DELETE(wordpath+"/wordlist/:id", rg.WordH.DELETEWords())
 }
 
 // StartServer サーバーの立ち上げ

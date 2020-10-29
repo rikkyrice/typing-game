@@ -146,7 +146,7 @@ func (wlR *wordListRepository) UpdateWordListByID(id string, wl model.WordList) 
 func (wlR *wordListRepository) RemoveWordListByID(id string) error {
 	_, err := wlR.deleteWordListByIDPstmt.Exec(id)
 	if err != nil {
-		return errors.Wrap(err, "単語帳の削除にしっぱしました。")
+		return errors.Wrap(err, "単語帳の削除に失敗しました。")
 	}
 	return nil
 }
