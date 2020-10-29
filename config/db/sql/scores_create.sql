@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS Scores;
 
 CREATE TABLE Scores (
-    id INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 INCREMENT BY 1),
-    word_list_id INT NOT NULL,
+    id CHAR(36) NOT NULL,
+    word_list_id CHAR(36) NOT NULL,
     play_count INT NOT NULL,
     clear_type_count INT NOT NULL,
     miss_type_count INT NOT NULL,

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 
 	"gopkg.in/yaml.v2"
 )
@@ -14,6 +15,12 @@ import (
 // Config structure that defines the settings
 type Config struct {
 	DB *db.DBConnConfig `yaml:"db"`
+	TC *TokenConfig     `yaml:"token"`
+}
+
+// TokenConfig トークンの期限設定
+type TokenConfig struct {
+	Expired time.Duration `yaml:"expired"`
 }
 
 var configuration *Config = nil

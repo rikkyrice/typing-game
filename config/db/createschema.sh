@@ -7,6 +7,7 @@
 /database/config/db2inst1/sqllib/bin/db2 -tvf /var/custom/sql/wordlists_create.sql
 /database/config/db2inst1/sqllib/bin/db2 -tvf /var/custom/sql/words_create.sql
 /database/config/db2inst1/sqllib/bin/db2 -tvf /var/custom/sql/scores_create.sql
+/database/config/db2inst1/sqllib/bin/db2 -tvf /var/custom/sql/token_create.sql
 
 # insert data
 /database/config/db2inst1/sqllib/bin/db2 import from /var/custom/data/users.csv of del insert into Users
@@ -15,4 +16,3 @@
 /database/config/db2inst1/sqllib/bin/db2 import from /var/custom/data/scores.csv of del insert into Scores
 
 /database/config/db2inst1/sqllib/bin/db2 terminate
-touch /tmp/end.txt

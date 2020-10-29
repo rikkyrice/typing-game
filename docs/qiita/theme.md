@@ -1,13 +1,13 @@
 * ~~DB2のDBコンテナを立てる~~
 * ~~DBコンテナをシェルで初期化する~~
-* GoでDBコンテナと接続
+* ~~GoでDBコンテナと接続~~
 * GoでRESTAPI
 * Goでドメイン駆動設計
 * GoでAPI設計
 * Goでエラーハンドリング
 * Goのポインタ、備忘録
 * GoでProxyサーバー
-* GoでDBコンテナからデーターをREST APIで返そう
+* GoでDBコンテナからデータをREST APIで返そう
 * Goの文法
 * Vue.js
 * Nuxt.jsでBFF

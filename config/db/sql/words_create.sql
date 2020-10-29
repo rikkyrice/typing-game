@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS Words;
 
 CREATE TABLE Words (
-    id INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0 INCREMENT BY 1), 
-    word_list_id INT NOT NULL,
+    id CHAR(36) NOT NULL, 
+    word_list_id CHAR(36) NOT NULL,
     word VARCHAR(60) NOT NULL, 
     meaning VARCHAR(300),
     explanation VARCHAR(1024),
