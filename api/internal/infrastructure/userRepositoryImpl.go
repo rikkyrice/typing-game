@@ -21,6 +21,10 @@ const insertUserQuery string = `
 	VALUES(?,?,?,?)
 `
 
+const deleteUserQuery string = `
+	DELETE FROM users WHERE user_id = ?
+`
+
 // NewUserRepository ユーザーリポジトリの生成
 func NewUserRepository(conn *db.DBConn) (repository.UserRepository, error) {
 	errs := []error{}
@@ -29,6 +33,9 @@ func NewUserRepository(conn *db.DBConn) (repository.UserRepository, error) {
 	errs = append(errs, err)
 
 	insertUserPstmt, err := conn.GetPstmt(insertUserQuery)
+	errs = append(errs, err)
+
+	deleteUserPstmt, err := conn.GetPstmt(deleteUserQuery)
 	errs = append(errs, err)
 
 	// いずれかのステートメント生成が失敗した場合にはエラーを返す
@@ -41,6 +48,7 @@ func NewUserRepository(conn *db.DBConn) (repository.UserRepository, error) {
 	return &userRepository{
 		selectUserByIDPstmt: selectUserByIDPstmt,
 		insertUserPstmt:     insertUserPstmt,
+		deleteUserPstmt:     deleteUserPstmt,
 	}, nil
 }
 
@@ -48,6 +56,7 @@ func NewUserRepository(conn *db.DBConn) (repository.UserRepository, error) {
 type userRepository struct {
 	selectUserByIDPstmt *sql.Stmt
 	insertUserPstmt     *sql.Stmt
+	deleteUserPstmt     *sql.Stmt
 }
 
 func (uR *userRepository) FindUserByID(userID string) (*model.User, *apierror.Error) {
@@ -65,4 +74,19 @@ func (uR *userRepository) CreateUser(user model.User) (string, *apierror.Error) 
 		return "", apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "ユーザーの作成に失敗しました。"))
 	}
 	return user.ID, nil
+}
+
+func (uR *userRepository) RemoveUserByID(userID string) *apierror.Error {
+	res, err := uR.deleteUserPstmt.Exec(userID)
+	if err != nil {
+		return apierror.NewError(http.StatusNotFound, errors.Wrap(err, "ユーザーの削除に失敗しました。"))
+	}
+	rec, err := res.RowsAffected()
+	if err != nil {
+		return apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "削除した列の件数の取得に失敗しました。"))
+	}
+	if rec == 0 {
+		return apierror.NewError(http.StatusNotFound, errors.New("削除対象のリソースが存在しません。"))
+	}
+	return nil
 }
