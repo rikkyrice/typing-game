@@ -121,7 +121,7 @@ func (w *wordHandler) POSTWord() echo.HandlerFunc {
 
 		word, err := w.WordUseCase.PostWord(queryParams.toWord())
 		if err != nil {
-			c.Echo().Logger.Errorf("単語帳の作成に失敗しました。%+v", err)
+			c.Echo().Logger.Errorf("単語の作成に失敗しました。%+v", err)
 			return c.JSON(err.StatusCode, err)
 		}
 		res := &wordResponse{

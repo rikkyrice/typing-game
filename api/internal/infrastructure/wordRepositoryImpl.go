@@ -3,7 +3,6 @@ package infrastructure
 import (
 	"api/db"
 	"api/internal/common/apierror"
-	"api/internal/common/util"
 	"api/internal/domain/model"
 	"api/internal/domain/repository"
 	"database/sql"
@@ -28,7 +27,8 @@ const insertWordQuery string = `
 const updateWordByIDQuery string = `
 	UPDATE words
 	SET
-		word__title = ?,
+		word = ?,
+		meaning = ?,
 		explanation = ?,
 		updated_at = ?
 	WHERE id = ?
@@ -120,16 +120,12 @@ func (wR *wordRepository) FindWordByWordListID(wlID string) ([]*model.Word, *api
 }
 
 func (wR *wordRepository) CreateWord(w model.Word) (*model.Word, *apierror.Error) {
-	id, err := util.GenerateUUID()
-	if err != nil {
-		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "UUIDの生成に失敗しました。"))
-	}
-	_, err = wR.insertWordPstmt.Exec(id, &w.WordListID, &w.Word, &w.Meaning, &w.Explanation, &w.CreatedAt, &w.UpdatedAt)
+	_, err := wR.insertWordPstmt.Exec(&w.ID, &w.WordListID, &w.Word, &w.Meaning, &w.Explanation, &w.CreatedAt, &w.UpdatedAt)
 	if err != nil {
 		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "単語の作成に失敗しました。"))
 	}
 	return &model.Word{
-		ID:          id,
+		ID:          w.ID,
 		WordListID:  w.WordListID,
 		Word:        w.Word,
 		Meaning:     w.Meaning,

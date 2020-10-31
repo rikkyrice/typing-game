@@ -2,8 +2,12 @@ package usecase
 
 import (
 	"api/internal/common/apierror"
+	"api/internal/common/util"
 	"api/internal/domain/model"
 	"api/internal/domain/repository"
+	"net/http"
+
+	"github.com/pkg/errors"
 )
 
 // WordListUseCase 単語帳のサービスインターフェース
@@ -35,6 +39,11 @@ func (wl *wordlistUseCase) GetWordList(userID string) ([]*model.WordList, *apier
 }
 
 func (wl *wordlistUseCase) PostWordList(wordlist model.WordList) (*model.WordList, *apierror.Error) {
+	id, utilerr := util.GenerateUUID()
+	if utilerr != nil {
+		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(utilerr, "UUIDの生成に失敗しました。"))
+	}
+	wordlist.ID = id
 	createdWL, err := wl.WordListRepository.CreateWordList(wordlist)
 	if err != nil {
 		return nil, err

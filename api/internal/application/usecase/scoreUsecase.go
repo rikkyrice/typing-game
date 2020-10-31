@@ -2,8 +2,12 @@ package usecase
 
 import (
 	"api/internal/common/apierror"
+	"api/internal/common/util"
 	"api/internal/domain/model"
 	"api/internal/domain/repository"
+	"net/http"
+
+	"github.com/pkg/errors"
 )
 
 // ScoreUseCase スコアのサービスインターフェース
@@ -43,6 +47,11 @@ func (s *scoreUseCase) GetLatestScore(wlID string) (*model.Score, *apierror.Erro
 }
 
 func (s *scoreUseCase) PostScore(score model.Score) (*model.Score, *apierror.Error) {
+	id, utilerr := util.GenerateUUID()
+	if utilerr != nil {
+		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(utilerr, "UUIDの生成に失敗しました。"))
+	}
+	score.ID = id
 	createdS, err := s.ScoreRepository.CreateScore(score)
 	if err != nil {
 		return nil, err

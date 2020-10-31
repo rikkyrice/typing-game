@@ -3,7 +3,6 @@ package infrastructure
 import (
 	"api/db"
 	"api/internal/common/apierror"
-	"api/internal/common/util"
 	"api/internal/domain/model"
 	"api/internal/domain/repository"
 	"database/sql"
@@ -110,16 +109,12 @@ func (sR *scoreRepository) FIndLatestScoreByWordListID(wlID string) (*model.Scor
 }
 
 func (sR *scoreRepository) CreateScore(s model.Score) (*model.Score, *apierror.Error) {
-	id, err := util.GenerateUUID()
-	if err != nil {
-		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "UUIDの生成に失敗しました。"))
-	}
-	_, err = sR.insertScorePstmt.Exec(id, &s.WordListID, &s.PlayCount, &s.ClearTypeCount, &s.MissTypeCount, &s.CorrectRate, &s.PlayedAt)
+	_, err := sR.insertScorePstmt.Exec(&s.ID, &s.WordListID, &s.PlayCount, &s.ClearTypeCount, &s.MissTypeCount, &s.CorrectRate, &s.PlayedAt)
 	if err != nil {
 		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "スコアの作成に失敗しました。"))
 	}
 	return &model.Score{
-		ID:             id,
+		ID:             s.ID,
 		WordListID:     s.WordListID,
 		PlayCount:      s.PlayCount,
 		ClearTypeCount: s.ClearTypeCount,

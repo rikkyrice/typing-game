@@ -2,7 +2,6 @@ package infrastructure
 
 import (
 	"api/internal/common/apierror"
-	"api/internal/common/util"
 	"api/internal/domain/model"
 	"api/internal/domain/repository"
 	"database/sql"
@@ -112,16 +111,12 @@ func (wlR *wordListRepository) FindWordListByUserID(userID string) ([]*model.Wor
 }
 
 func (wlR *wordListRepository) CreateWordList(wl model.WordList) (*model.WordList, *apierror.Error) {
-	id, err := util.GenerateUUID()
-	if err != nil {
-		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "UUIDの生成に失敗しました。"))
-	}
-	_, err = wlR.insertWordListPstmt.Exec(id, wl.UserID, wl.Title, wl.Explanation, wl.CreatedAt, wl.UpdatedAt)
+	_, err := wlR.insertWordListPstmt.Exec(wl.ID, wl.UserID, wl.Title, wl.Explanation, wl.CreatedAt, wl.UpdatedAt)
 	if err != nil {
 		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "単語帳の作成に失敗しました。"))
 	}
 	return &model.WordList{
-		ID:          id,
+		ID:          wl.ID,
 		UserID:      wl.UserID,
 		Title:       wl.Title,
 		Explanation: wl.Explanation,
