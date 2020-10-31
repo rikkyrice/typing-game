@@ -2,10 +2,12 @@ package infrastructure
 
 import (
 	"api/db"
+	"api/internal/common/apierror"
 	"api/internal/common/util"
 	"api/internal/domain/model"
 	"api/internal/domain/repository"
 	"database/sql"
+	"net/http"
 
 	"github.com/pkg/errors"
 )
@@ -79,18 +81,18 @@ type scoreRepository struct {
 	deleteAllScoreByWordListIDPstmt    *sql.Stmt
 }
 
-func (sR *scoreRepository) FindScoreByWordListID(wlID string) ([]*model.Score, error) {
+func (sR *scoreRepository) FindScoreByWordListID(wlID string) ([]*model.Score, *apierror.Error) {
 	ss := []*model.Score{}
 
 	rows, err := sR.selectScoreByWordListIDPstmt.Query(wlID)
 	if err != nil {
-		return ss, errors.Wrap(err, "クエリ実行に失敗")
+		return ss, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "クエリの実行に失敗しました。"))
 	}
 
 	for rows.Next() {
 		var s model.Score
 		if err := rows.Scan(&s.ID, &s.WordListID, &s.PlayCount, &s.ClearTypeCount, &s.MissTypeCount, &s.CorrectRate, &s.PlayedAt); err != nil {
-			return nil, errors.Wrap(err, "クエリの読み込みに失敗")
+			return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "レコードの読み取りに失敗しました。"))
 		}
 		ss = append(ss, &s)
 	}
@@ -98,23 +100,23 @@ func (sR *scoreRepository) FindScoreByWordListID(wlID string) ([]*model.Score, e
 	return ss, nil
 }
 
-func (sR *scoreRepository) FIndLatestScoreByWordListID(wlID string) (*model.Score, error) {
+func (sR *scoreRepository) FIndLatestScoreByWordListID(wlID string) (*model.Score, *apierror.Error) {
 	var s model.Score
 
 	if err := sR.selectLatestScoreByWordListIDPstmt.QueryRow(wlID).Scan(&s.ID, &s.WordListID, &s.PlayCount, &s.ClearTypeCount, &s.MissTypeCount, &s.CorrectRate, &s.PlayedAt); err != nil {
-		return nil, errors.Wrap(err, "クエリ実行に失敗")
+		return nil, apierror.NewError(http.StatusNotFound, errors.Wrapf(err, "ID[%s]の単語帳の最新のスコアが見つかりません。", wlID))
 	}
 	return &s, nil
 }
 
-func (sR *scoreRepository) CreateScore(s model.Score) (*model.Score, error) {
+func (sR *scoreRepository) CreateScore(s model.Score) (*model.Score, *apierror.Error) {
 	id, err := util.GenerateUUID()
 	if err != nil {
-		return nil, errors.Wrap(err, "UUIDの生成に失敗しました。")
+		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "UUIDの生成に失敗しました。"))
 	}
 	_, err = sR.insertScorePstmt.Exec(id, &s.WordListID, &s.PlayCount, &s.ClearTypeCount, &s.MissTypeCount, &s.CorrectRate, &s.PlayedAt)
 	if err != nil {
-		return nil, errors.Wrap(err, "スコアの作成に失敗しました。")
+		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "スコアの作成に失敗しました。"))
 	}
 	return &model.Score{
 		ID:             id,
@@ -124,21 +126,34 @@ func (sR *scoreRepository) CreateScore(s model.Score) (*model.Score, error) {
 		MissTypeCount:  s.MissTypeCount,
 		CorrectRate:    s.CorrectRate,
 		PlayedAt:       s.PlayedAt,
-	}, err
+	}, nil
 }
 
-func (sR *scoreRepository) RemoveScoreByID(id string) error {
-	_, err := sR.deleteScoreByIDPstmt.Exec(id)
+func (sR *scoreRepository) RemoveScoreByID(id string) *apierror.Error {
+	res, err := sR.deleteScoreByIDPstmt.Exec(id)
 	if err != nil {
-		return errors.Wrap(err, "スコアの削除に失敗しました。")
+		return apierror.NewError(http.StatusNotFound, errors.Wrapf(err, "ID[%s]のスコアの削除に失敗しました。", id))
+	}
+	rec, err := res.RowsAffected()
+	if err != nil {
+		return apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "削除した列の件数の取得に失敗しました。"))
+	}
+	if rec == 0 {
+		return apierror.NewError(http.StatusNotFound, errors.New("削除対象のリソースが存在しません。"))
 	}
 	return nil
 }
 
-func (sR *scoreRepository) RemoveAllScoreByWordListID(wlID string) error {
-	_, err := sR.deleteAllScoreByWordListIDPstmt.Exec(wlID)
+func (sR *scoreRepository) RemoveAllScoreByWordListID(wlID string) *apierror.Error {
+	ss, err := sR.FindScoreByWordListID(wlID)
 	if err != nil {
-		return errors.Wrap(err, "スコアの全削除に失敗しました。")
+		return err
+	}
+	for _, s := range ss {
+		err := sR.RemoveScoreByID(s.ID)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

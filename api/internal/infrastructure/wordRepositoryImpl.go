@@ -2,10 +2,12 @@ package infrastructure
 
 import (
 	"api/db"
+	"api/internal/common/apierror"
 	"api/internal/common/util"
 	"api/internal/domain/model"
 	"api/internal/domain/repository"
 	"database/sql"
+	"net/http"
 
 	"github.com/pkg/errors"
 )
@@ -89,27 +91,27 @@ type wordRepository struct {
 	deleteAllWordByWordListIDPstmt *sql.Stmt
 }
 
-func (wR *wordRepository) FindWordByID(id string) (*model.Word, error) {
+func (wR *wordRepository) FindWordByID(id string) (*model.Word, *apierror.Error) {
 	var w model.Word
 
 	if err := wR.selectWordByIDPstmt.QueryRow(id).Scan(&w.ID, &w.WordListID, &w.Word, &w.Meaning, &w.Explanation, &w.CreatedAt, &w.UpdatedAt); err != nil {
-		return nil, errors.Wrap(err, "クエリ実行に失敗")
+		return nil, apierror.NewError(http.StatusNotFound, errors.Wrapf(err, "ID[%s]の単語が見つかりません。", id))
 	}
 	return &w, nil
 }
 
-func (wR *wordRepository) FindWordByWordListID(wlID string) ([]*model.Word, error) {
+func (wR *wordRepository) FindWordByWordListID(wlID string) ([]*model.Word, *apierror.Error) {
 	ws := []*model.Word{}
 
 	rows, err := wR.selectWordByWordListIDPstmt.Query(wlID)
 	if err != nil {
-		return ws, errors.Wrap(err, "クエリ実行に失敗")
+		return ws, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "クエリの実行に失敗しました。"))
 	}
 
 	for rows.Next() {
 		var w model.Word
 		if err := rows.Scan(&w.ID, &w.WordListID, &w.Word, &w.Meaning, &w.Explanation, &w.CreatedAt, &w.UpdatedAt); err != nil {
-			return nil, errors.Wrap(err, "クエリの読み込みに失敗")
+			return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "レコードの読み取りに失敗しました。"))
 		}
 		ws = append(ws, &w)
 	}
@@ -117,14 +119,14 @@ func (wR *wordRepository) FindWordByWordListID(wlID string) ([]*model.Word, erro
 	return ws, nil
 }
 
-func (wR *wordRepository) CreateWord(w model.Word) (*model.Word, error) {
+func (wR *wordRepository) CreateWord(w model.Word) (*model.Word, *apierror.Error) {
 	id, err := util.GenerateUUID()
 	if err != nil {
-		return nil, errors.Wrap(err, "UUIDの生成に失敗しました。")
+		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "UUIDの生成に失敗しました。"))
 	}
 	_, err = wR.insertWordPstmt.Exec(id, &w.WordListID, &w.Word, &w.Meaning, &w.Explanation, &w.CreatedAt, &w.UpdatedAt)
 	if err != nil {
-		return nil, errors.Wrap(err, "単語の作成に失敗しました。")
+		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "単語の作成に失敗しました。"))
 	}
 	return &model.Word{
 		ID:          id,
@@ -134,10 +136,10 @@ func (wR *wordRepository) CreateWord(w model.Word) (*model.Word, error) {
 		Explanation: w.Explanation,
 		CreatedAt:   w.CreatedAt,
 		UpdatedAt:   w.UpdatedAt,
-	}, err
+	}, nil
 }
 
-func (wR *wordRepository) CreateAllWord(ws []model.Word) ([]*model.Word, error) {
+func (wR *wordRepository) CreateAllWord(ws []model.Word) ([]*model.Word, *apierror.Error) {
 	words := []*model.Word{}
 	for _, w := range ws {
 		word, err := wR.CreateWord(w)
@@ -149,10 +151,17 @@ func (wR *wordRepository) CreateAllWord(ws []model.Word) ([]*model.Word, error) 
 	return words, nil
 }
 
-func (wR *wordRepository) UpdateWordByID(id string, w model.Word) (*model.Word, error) {
-	_, err := wR.updateWordByIDPstmt.Exec(w.Word, w.Meaning, w.Explanation, w.UpdatedAt, id)
+func (wR *wordRepository) UpdateWordByID(id string, w model.Word) (*model.Word, *apierror.Error) {
+	res, err := wR.updateWordByIDPstmt.Exec(w.Word, w.Meaning, w.Explanation, w.UpdatedAt, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "単語の更新に失敗しました。")
+		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "単語の更新に失敗しました。"))
+	}
+	rec, err := res.RowsAffected()
+	if err != nil {
+		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "更新した列の件数の取得に失敗しました。"))
+	}
+	if rec == 0 {
+		return nil, apierror.NewError(http.StatusNotFound, errors.New("更新対象のリソースが存在しません。"))
 	}
 	return &model.Word{
 		ID:          id,
@@ -162,21 +171,34 @@ func (wR *wordRepository) UpdateWordByID(id string, w model.Word) (*model.Word, 
 		Explanation: w.Explanation,
 		CreatedAt:   w.CreatedAt,
 		UpdatedAt:   w.UpdatedAt,
-	}, err
+	}, nil
 }
 
-func (wR *wordRepository) RemoveWordByID(id string) error {
-	_, err := wR.deleteWordByIDPstmt.Exec(id)
+func (wR *wordRepository) RemoveWordByID(id string) *apierror.Error {
+	res, err := wR.deleteWordByIDPstmt.Exec(id)
 	if err != nil {
-		return errors.Wrap(err, "単語の削除に失敗しました。")
+		return apierror.NewError(http.StatusNotFound, errors.Wrapf(err, "ID[%s]の単語の削除に失敗しました。", id))
+	}
+	rec, err := res.RowsAffected()
+	if err != nil {
+		return apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "削除した列の件数の取得に失敗しました。"))
+	}
+	if rec == 0 {
+		return apierror.NewError(http.StatusNotFound, errors.New("削除対象のリソースが存在しません。"))
 	}
 	return nil
 }
 
-func (wR *wordRepository) RemoveAllWordByWordListID(wlID string) error {
-	_, err := wR.deleteAllWordByWordListIDPstmt.Exec(wlID)
+func (wR *wordRepository) RemoveAllWordByWordListID(wlID string) *apierror.Error {
+	ws, err := wR.FindWordByWordListID(wlID)
 	if err != nil {
-		return errors.Wrap(err, "単語の全削除に失敗しました。")
+		return err
+	}
+	for _, w := range ws {
+		err := wR.RemoveWordByID(w.ID)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

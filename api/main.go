@@ -10,10 +10,7 @@ import (
 )
 
 // TODO: Db2の日本語化
-// TODO: wordlistをWordListではなくWordlistにリファクタリング
 // TODO: routingリファクタリング
-// TODO: putした時にリソースが無くてもレスポンスがリクエストした内容を返す仕様を変更
-// TODO: リソースがないときにresource not foundとなるようにリファクタリング
 
 func main() {
 	c, err := config.Init("config/env.yaml")

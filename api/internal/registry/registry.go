@@ -48,7 +48,7 @@ func NewRegistry(conn *db.DBConn) *Registry {
 	if err != nil {
 		return nil
 	}
-	sR, err := infrastucture.NewScoreRepository(conn)
+	sR, err := infrastructure.NewScoreRepository(conn)
 	if err != nil {
 		return nil
 	}

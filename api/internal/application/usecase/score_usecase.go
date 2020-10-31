@@ -1,18 +1,17 @@
 package usecase
 
 import (
+	"api/internal/common/apierror"
 	"api/internal/domain/model"
 	"api/internal/domain/repository"
-
-	"github.com/pkg/errors"
 )
 
 // ScoreUseCase スコアのサービスインターフェース
 type ScoreUseCase interface {
-	GetScores(wlID string) ([]*model.Score, error)
-	GetLatestScore(wlID string) (*model.Score, error)
-	PostScore(score model.Score) (*model.Score, error)
-	DeleteAllScore(wlID string) error
+	GetScores(wlID string) ([]*model.Score, *apierror.Error)
+	GetLatestScore(wlID string) (*model.Score, *apierror.Error)
+	PostScore(score model.Score) (*model.Score, *apierror.Error)
+	DeleteAllScore(wlID string) *apierror.Error
 }
 
 // NewScoreUseCase スコア用サービス生成
@@ -26,34 +25,34 @@ type scoreUseCase struct {
 	ScoreRepository repository.ScoreRepository
 }
 
-func (s *scoreUseCase) GetScores(wlID string) ([]*model.Score, error) {
+func (s *scoreUseCase) GetScores(wlID string) ([]*model.Score, *apierror.Error) {
 	scores := []*model.Score{}
 	scores, err := s.ScoreRepository.FindScoreByWordListID(wlID)
 	if err != nil {
-		return scores, errors.Wrap(err, "スコアの全件取得に失敗しました。")
+		return scores, err
 	}
 	return scores, nil
 }
 
-func (s *scoreUseCase) GetLatestScore(wlID string) (*model.Score, error) {
+func (s *scoreUseCase) GetLatestScore(wlID string) (*model.Score, *apierror.Error) {
 	score, err := s.ScoreRepository.FIndLatestScoreByWordListID(wlID)
 	if err != nil {
-		return nil, errors.Wrap(err, "最新のスコア取得に失敗しました。")
+		return nil, err
 	}
 	return score, nil
 }
 
-func (s *scoreUseCase) PostScore(score model.Score) (*model.Score, error) {
+func (s *scoreUseCase) PostScore(score model.Score) (*model.Score, *apierror.Error) {
 	createdS, err := s.ScoreRepository.CreateScore(score)
 	if err != nil {
-		return nil, errors.Wrap(err, "スコアの作成に失敗しました。")
+		return nil, err
 	}
 	return createdS, nil
 }
 
-func (s *scoreUseCase) DeleteAllScore(wlID string) error {
+func (s *scoreUseCase) DeleteAllScore(wlID string) *apierror.Error {
 	if err := s.ScoreRepository.RemoveAllScoreByWordListID(wlID); err != nil {
-		return errors.Wrap(err, "スコアの一括削除に失敗しました。")
+		return err
 	}
 	return nil
 }

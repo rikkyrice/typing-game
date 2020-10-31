@@ -2,7 +2,6 @@ package handler
 
 import (
 	"api/internal/application/usecase"
-	"api/internal/common/apierror"
 	"api/internal/domain/model"
 	"net/http"
 	"time"
@@ -37,7 +36,7 @@ type wordlistsResponse struct {
 func (wl *wordlistHandler) GETWordList() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		headerParams, err := getHeaderParams(c)
@@ -48,7 +47,7 @@ func (wl *wordlistHandler) GETWordList() echo.HandlerFunc {
 
 		wordlists, err := wl.WordListUseCase.GetWordList(headerParams.UserID)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		res := &wordlistsResponse{
 			Matched:   len(wordlists),
@@ -84,78 +83,70 @@ type wordlistResponse struct {
 func (wl *wordlistHandler) POSTWordList() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		var queryParams wordlistQueryRequest
-		if err := c.Bind(&queryParams); err != nil {
-			c.Echo().Logger.Errorf("リクエストボディの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
-		}
-		if err := c.Validate(&queryParams); err != nil {
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
+		if err := getQueryParams(c, &queryParams); err != nil {
+			return c.JSON(err.StatusCode, err)
 		}
 
 		wordlist, err := wl.WordListUseCase.PostWordList(queryParams.toWordList())
 		if err != nil {
 			c.Echo().Logger.Errorf("単語帳の作成に失敗しました。%+v", err)
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		res := &wordlistResponse{
 			WordList: wordlist,
 		}
-		return c.JSON(http.StatusOK, res)
+		return c.JSON(http.StatusCreated, res)
 	}
 }
 
 func (wl *wordlistHandler) PUTWordList() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		pathParams, err := getPathParams(c)
 		if err != nil {
 			c.Echo().Logger.Errorf("パスパラメータの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		var queryParams wordlistQueryRequest
-		if err := c.Bind(&queryParams); err != nil {
-			c.Echo().Logger.Errorf("リクエストボディの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
-		}
-		if err := c.Validate(&queryParams); err != nil {
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
+		if err := getQueryParams(c, &queryParams); err != nil {
+			return c.JSON(err.StatusCode, err)
 		}
 
 		wordlist, err := wl.WordListUseCase.PutWordList(pathParams.ID, queryParams.toWordList())
 		if err != nil {
 			c.Echo().Logger.Errorf("単語帳の更新に失敗しました。%+v", err)
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		res := &wordlistResponse{
 			WordList: wordlist,
 		}
-		return c.JSON(http.StatusOK, res)
+		return c.JSON(http.StatusCreated, res)
 	}
 }
 
 func (wl *wordlistHandler) DELETEWordList() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		pathParams, err := getPathParams(c)
 		if err != nil {
 			c.Echo().Logger.Errorf("パスパラメータの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 
 		err = wl.WordListUseCase.DeleteWordList(pathParams.ID)
 		if err != nil {
 			c.Echo().Logger.Errorf("単語帳の削除に失敗しました。%+v", err)
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		return c.NoContent(http.StatusNoContent)
 	}

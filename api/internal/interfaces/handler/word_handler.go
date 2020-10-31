@@ -2,7 +2,6 @@ package handler
 
 import (
 	"api/internal/application/usecase"
-	"api/internal/common/apierror"
 	"api/internal/domain/model"
 	"net/http"
 	"time"
@@ -39,18 +38,18 @@ type wordResponse struct {
 func (w *wordHandler) GETWord() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		pathParams, err := getPathParams(c)
 		if err != nil {
 			c.Echo().Logger.Errorf("パスパラメータの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 
 		word, err := w.WordUseCase.GetWord(pathParams.ID)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		res := &wordResponse{
 			Word: word,
@@ -67,18 +66,18 @@ type wordsResponse struct {
 func (w *wordHandler) GETWords() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		pathParams, err := getPathParams(c)
 		if err != nil {
 			c.Echo().Logger.Errorf("パスパラメータの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 
 		words, err := w.WordUseCase.GetWordByWordListID(pathParams.ID)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		res := &wordsResponse{
 			Matched: len(words),
@@ -112,27 +111,23 @@ func (wR *wordQueryRequest) toWord() model.Word {
 func (w *wordHandler) POSTWord() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		var queryParams wordQueryRequest
-		if err := c.Bind(&queryParams); err != nil {
-			c.Echo().Logger.Errorf("リクエストボディの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
-		}
-		if err := c.Validate(&queryParams); err != nil {
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
+		if err := getQueryParams(c, &queryParams); err != nil {
+			return c.JSON(err.StatusCode, err)
 		}
 
 		word, err := w.WordUseCase.PostWord(queryParams.toWord())
 		if err != nil {
 			c.Echo().Logger.Errorf("単語帳の作成に失敗しました。%+v", err)
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		res := &wordResponse{
 			Word: word,
 		}
-		return c.JSON(http.StatusOK, res)
+		return c.JSON(http.StatusCreated, res)
 	}
 }
 
@@ -147,16 +142,12 @@ type wordsPostResponse struct {
 func (w *wordHandler) POSTWords() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		var queryParams wordsQueryRequest
-		if err := c.Bind(&queryParams); err != nil {
-			c.Echo().Logger.Errorf("リクエストボディの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
-		}
-		if err := c.Validate(&queryParams); err != nil {
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
+		if err := getQueryParams(c, &queryParams); err != nil {
+			return c.JSON(err.StatusCode, err)
 		}
 		queryWords := []model.Word{}
 		for _, word := range queryParams.Words {
@@ -166,19 +157,19 @@ func (w *wordHandler) POSTWords() echo.HandlerFunc {
 		words, err := w.WordUseCase.PostAllWord(queryWords)
 		if err != nil {
 			c.Echo().Logger.Errorf("単語帳の作成に失敗しました。%+v", err)
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		res := &wordsPostResponse{
 			Words: words,
 		}
-		return c.JSON(http.StatusOK, res)
+		return c.JSON(http.StatusCreated, res)
 	}
 }
 
 func (w *wordHandler) PUTWord() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		pathParams, err := getPathParams(c)
@@ -187,42 +178,38 @@ func (w *wordHandler) PUTWord() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 		var queryParams wordQueryRequest
-		if err := c.Bind(&queryParams); err != nil {
-			c.Echo().Logger.Errorf("リクエストボディの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
-		}
-		if err := c.Validate(&queryParams); err != nil {
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
+		if err := getQueryParams(c, &queryParams); err != nil {
+			return c.JSON(err.StatusCode, err)
 		}
 
 		word, err := w.WordUseCase.PutWord(pathParams.ID, queryParams.toWord())
 		if err != nil {
 			c.Echo().Logger.Errorf("単語帳の更新に失敗しました。%+v", err)
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		res := &wordResponse{
 			Word: word,
 		}
-		return c.JSON(http.StatusOK, res)
+		return c.JSON(http.StatusCreated, res)
 	}
 }
 
 func (w *wordHandler) DELETEWord() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		pathParams, err := getPathParams(c)
 		if err != nil {
 			c.Echo().Logger.Errorf("パスパラメータの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 
 		err = w.WordUseCase.DeleteWord(pathParams.ID)
 		if err != nil {
 			c.Echo().Logger.Errorf("単語帳の削除に失敗しました。%+v", err)
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		return c.NoContent(http.StatusNoContent)
 	}
@@ -231,19 +218,19 @@ func (w *wordHandler) DELETEWord() echo.HandlerFunc {
 func (w *wordHandler) DELETEWords() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if err := usecase.Authenticate(c); err != nil {
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
 		pathParams, err := getPathParams(c)
 		if err != nil {
 			c.Echo().Logger.Errorf("パスパラメータの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, err)
+			return c.JSON(err.StatusCode, err)
 		}
 
 		err = w.WordUseCase.DeleteAllWord(pathParams.ID)
 		if err != nil {
 			c.Echo().Logger.Errorf("単語帳の削除に失敗しました。%+v", err)
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		return c.NoContent(http.StatusNoContent)
 	}

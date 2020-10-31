@@ -32,8 +32,8 @@ type Auth struct {
 
 // AuthUseCase auth用のサービス
 type AuthUseCase interface {
-	GetUserByID(id string) (model.User, error)
-	PostToken(userID string) (*model.Token, error)
+	GetUserByID(id string) (*model.User, *apierror.Error)
+	PostToken(userID string) (*model.Token, *apierror.Error)
 }
 
 // NewAuthUseCase 認証ユースケースを生成
@@ -49,15 +49,15 @@ type authUseCase struct {
 	UserRepository  repository.UserRepository
 }
 
-func (a *authUseCase) GetUserByID(id string) (model.User, error) {
+func (a *authUseCase) GetUserByID(id string) (*model.User, *apierror.Error) {
 	user, err := a.UserRepository.FindUserByID(id)
 	if err != nil {
-		return model.User{}, err
+		return nil, apierror.NewError(http.StatusNotFound, errors.Wrap(err, "ユーザーが見つかりません。"))
 	}
 	return user, nil
 }
 
-func (a *authUseCase) PostToken(userID string) (*model.Token, error) {
+func (a *authUseCase) PostToken(userID string) (*model.Token, *apierror.Error) {
 	c, err := config.Init("config/env.yaml")
 	if err != nil {
 		fmt.Printf("設定ファイルの読み込みに失敗しました。%+v", err)
@@ -66,7 +66,7 @@ func (a *authUseCase) PostToken(userID string) (*model.Token, error) {
 	exp := iat.Add(c.TC.Expired * time.Second)
 	tokenString, err := createToken(userID, iat, exp)
 	if err != nil {
-		return nil, err
+		return nil, apierror.NewError(http.StatusInternalServerError, err)
 	}
 
 	token := &model.Token{
@@ -139,7 +139,7 @@ func parse(signedString string) (*Auth, error) {
 }
 
 // Authenticate 認証を実施
-func Authenticate(c echo.Context) error {
+func Authenticate(c echo.Context) *apierror.Error {
 	tokenString := c.Request().Header.Get("Authorization")
 	if tokenString == "" {
 		return apierror.NewError(http.StatusUnauthorized, errors.New("Authorizationヘッダーに値がありません。"))
@@ -150,7 +150,7 @@ func Authenticate(c echo.Context) error {
 	}
 
 	if err := validateToken(strings.Replace(tokenString, "Bearer ", "", 1), userID); err != nil {
-		return err
+		return apierror.NewError(http.StatusUnauthorized, err)
 	}
 	return nil
 }
@@ -158,10 +158,10 @@ func Authenticate(c echo.Context) error {
 func validateToken(tokenString string, userID string) error {
 	auth, err := parse(tokenString)
 	if err != nil {
-		return apierror.NewError(http.StatusUnauthorized, err)
+		return err
 	}
 	if userID != auth.UserID {
-		return apierror.NewError(http.StatusUnauthorized, errors.Wrapf(err, "failed authentication, userID=%s, userIDPayload=%s", userID, auth.UserID))
+		return errors.Wrapf(err, "failed authentication, userID=%s, userIDPayload=%s", userID, auth.UserID)
 	}
 	return nil
 }

@@ -2,10 +2,11 @@ package infrastructure
 
 import (
 	"api/db"
+	"api/internal/common/apierror"
 	"api/internal/domain/model"
 	"api/internal/domain/repository"
-	"context"
 	"database/sql"
+	"net/http"
 
 	"github.com/pkg/errors"
 )
@@ -26,6 +27,7 @@ const deleteTokenByUserIDQuery string = `
 	WHERE user_id = ?
 `
 
+// NewTokenRepository ORMapper
 func NewTokenRepository(conn *db.DBConn) (repository.TokenRepository, error) {
 	errs := []error{}
 
@@ -58,27 +60,34 @@ type tokenRepository struct {
 	deleteTokenByUserIDPstmt *sql.Stmt
 }
 
-func (tR *tokenRepository) FindTokenByUserID(ctx context.Context, userID string) (model.Token, error) {
+func (tR *tokenRepository) FindTokenByUserID(userID string) (*model.Token, *apierror.Error) {
 	var token model.Token
 
 	if err := tR.selectTokenByUserIDPstmt.QueryRow(userID).Scan(&token.Token, &token.UserID, &token.CreatedAt, &token.ExpiredAt); err != nil {
-		return model.Token{}, errors.Wrap(err, "クエリ実行に失敗")
+		return nil, apierror.NewError(http.StatusNotFound, errors.Wrap(err, "トークンが見つかりません。"))
 	}
-	return token, nil
+	return &token, nil
 }
 
-func (tR *tokenRepository) StoreToken(t *model.Token) error {
+func (tR *tokenRepository) StoreToken(t *model.Token) *apierror.Error {
 	_, err := tR.insertTokenPstmt.Exec(t.Token, t.UserID, t.CreatedAt, t.ExpiredAt)
 	if err != nil {
-		return errors.Wrap(err, "トークンの作成に失敗しました。")
+		return apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "トークンの保存に失敗しました。"))
 	}
-	return err
+	return nil
 }
 
-func (tR *tokenRepository) RemoveTokenByUserID(ctx context.Context, userID string) error {
-	_, err := tR.deleteTokenByUserIDPstmt.Exec(userID)
+func (tR *tokenRepository) RemoveTokenByUserID(userID string) *apierror.Error {
+	res, err := tR.deleteTokenByUserIDPstmt.Exec(userID)
 	if err != nil {
-		return errors.Wrap(err, "トークンの削除に失敗しました。")
+		return apierror.NewError(http.StatusNotFound, errors.Wrap(err, "トークンの削除に失敗しました。"))
+	}
+	rec, err := res.RowsAffected()
+	if err != nil {
+		return apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "削除した列の件数の取得に失敗しました。"))
+	}
+	if rec == 0 {
+		return apierror.NewError(http.StatusNotFound, errors.New("削除対象のリソースが存在しません。"))
 	}
 	return nil
 }

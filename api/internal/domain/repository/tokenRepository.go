@@ -1,16 +1,16 @@
 package repository
 
 import (
+	"api/internal/common/apierror"
 	"api/internal/domain/model"
-	"context"
 )
 
 // TokenRepository トークンのリポジトリインターフェース
 type TokenRepository interface {
 	// FindTokenByUserID トークン取得
-	FindTokenByUserID(ctx context.Context, userID string) (model.Token, error)
+	FindTokenByUserID(userID string) (*model.Token, *apierror.Error)
 	// StoreToken トークン作成
-	StoreToken(t *model.Token) error
+	StoreToken(t *model.Token) *apierror.Error
 	// RemoveTokenByUserID トークン削除
-	RemoveTokenByUserID(ctx context.Context, userID string) error
+	RemoveTokenByUserID(userID string) *apierror.Error
 }

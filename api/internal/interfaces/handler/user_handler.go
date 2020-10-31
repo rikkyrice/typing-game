@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"api/internal/application/usecase"
-	"api/internal/common/apierror"
 	"api/internal/domain/model"
 
 	"github.com/labstack/echo"
@@ -56,23 +55,19 @@ type tokenResponse struct {
 func (u *userHandler) Signup() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var queryParams signupQueryRequest
-		if err := c.Bind(&queryParams); err != nil {
-			c.Echo().Logger.Errorf("リクエストボディの読み込みに失敗しました。%+v", err)
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
-		}
-		if err := c.Validate(&queryParams); err != nil {
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
+		if err := getQueryParams(c, &queryParams); err != nil {
+			return c.JSON(err.StatusCode, err)
 		}
 
 		token, err := u.userUC.Signup(queryParams.toUser())
 		if err != nil {
 			c.Echo().Logger.Errorf("ユーザー登録に失敗しました。%+v", err)
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		res := &tokenResponse{
 			Token: token.Token,
 		}
-		return c.JSON(http.StatusOK, res)
+		return c.JSON(http.StatusCreated, res)
 	}
 }
 
@@ -89,18 +84,14 @@ func (u *userHandler) Login() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, err)
 		}
 		var queryParams loginQueryRequest
-		if err := c.Bind(&queryParams); err != nil {
-			c.Echo().Logger.Errorf("リクエストボディの読み込みに失敗しました。%+v", err)
-			return echo.NewHTTPError(http.StatusBadRequest, err)
-		}
-		if err := c.Validate(&queryParams); err != nil {
-			return c.JSON(http.StatusBadRequest, apierror.NewError(http.StatusBadRequest, err))
+		if err := getQueryParams(c, &queryParams); err != nil {
+			return c.JSON(err.StatusCode, err)
 		}
 
 		token, err := u.userUC.Login(headerParams.UserID, queryParams.Password)
 		if err != nil {
 			c.Echo().Logger.Errorf("ログインに失敗しました。%+v", err)
-			return c.JSON(http.StatusInternalServerError, apierror.NewError(http.StatusInternalServerError, err))
+			return c.JSON(err.StatusCode, err)
 		}
 		res := &tokenResponse{
 			Token: token.Token,
