@@ -9,9 +9,6 @@ import (
 	"api/internal/registry"
 )
 
-// TODO: Db2の日本語化
-// TODO: routingリファクタリング
-
 func main() {
 	c, err := config.Init("config/env.yaml")
 	if err != nil {
