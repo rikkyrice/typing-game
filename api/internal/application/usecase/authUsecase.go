@@ -69,6 +69,8 @@ func (a *authUseCase) PostToken(userID string) (*model.Token, *apierror.Error) {
 		return nil, apierror.NewError(http.StatusInternalServerError, err)
 	}
 
+	// fmt.Println(tokenString)
+
 	token := &model.Token{
 		Token:     tokenString,
 		UserID:    userID,

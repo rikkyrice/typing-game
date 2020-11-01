@@ -103,7 +103,7 @@ func Testユーザー登録ID重複(t *testing.T) {
 	r := router.NewRouter()
 	r.Init(rg)
 
-	userID := "rikky"
+	userID := "riku"
 	mail := "user01@gmail.com"
 	password := "user01"
 	createdAt := time.Now().Format("2006-01-02T15:04:05+09:00")
@@ -118,7 +118,6 @@ func Testユーザー登録ID重複(t *testing.T) {
 	rec := httptest.NewRecorder()
 
 	r.Router.ServeHTTP(rec, req)
-	defer rg.UserR.RemoveUserByID(userID)
 
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 }
@@ -207,7 +206,7 @@ func Testログイン時ユーザーが見つからない(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, rec1.Code)
 
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Millisecond * 1)
 
 	notfounduser := "notfounduser"
 	jsonBlob2 := []byte(fmt.Sprintf(`{
@@ -257,7 +256,7 @@ func Testログイン時パスワード違い(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, rec1.Code)
 
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Millisecond * 1)
 
 	wrongPassword := "wrongpassword"
 	jsonBlob2 := []byte(fmt.Sprintf(`{
@@ -288,27 +287,43 @@ func Test単語帳作成(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語帳作成
@@ -332,7 +347,7 @@ func Test単語帳作成(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var wlRes wordlistResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -360,27 +375,43 @@ func Test単語帳取得(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語帳作成
@@ -403,7 +434,7 @@ func Test単語帳取得(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var wlsRes wordlistsResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -432,27 +463,43 @@ func Test単語帳更新(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語帳作成
@@ -483,7 +530,7 @@ func Test単語帳更新(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var wlRes wordlistResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -529,6 +576,8 @@ func Test単語帳更新ID不一致(t *testing.T) {
 	r.Router.ServeHTTP(rec1, req1)
 
 	assert.Equal(t, http.StatusOK, rec1.Code)
+
+	time.Sleep(time.Millisecond * 1)
 
 	var tokenRes tokenResponse
 	body, err := ioutil.ReadAll(rec1.Body)
@@ -587,27 +636,43 @@ func Test単語帳削除(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語帳作成
@@ -652,27 +717,43 @@ func Test単語帳削除ID不一致(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語帳作成
@@ -715,27 +796,43 @@ func Test単語作成(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語作成
@@ -760,7 +857,7 @@ func Test単語作成(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var wRes wordResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -794,27 +891,43 @@ func Test単語作成単語帳IDが存在しない(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語作成
@@ -858,27 +971,43 @@ func Test単語作成複数(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語のリスト作成
@@ -917,7 +1046,7 @@ func Test単語作成複数(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var wsRes wordsResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -954,27 +1083,43 @@ func Test単語取得(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語作成
@@ -998,7 +1143,7 @@ func Test単語取得(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var wRes wordResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -1032,27 +1177,43 @@ func Test単語取得ID不一致(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語作成
@@ -1096,34 +1257,62 @@ func Test単語取得複数(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
 	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
+	}
+
+	// 単語帳作成
+	wl := model.WordList{
+		ID:          "bb8938cb-0289-4ed4-9b5e-408d309739ad",
+		UserID:      userID,
+		Title:       "TOEIC",
+		Explanation: "TOEIC勉強用の単語帳です。",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	rg.WordListR.CreateWordList(wl)
+	defer rg.WordListR.RemoveWordListByID(wl.ID)
 
 	// 単語のリスト作成
 	ws := []model.Word{
 		{
 			ID:          "word18ca-0289-4ed4-9b5e-408d309739ad",
-			WordListID:  "5f52039d-d983-4ebd-90b2-e3e04f821896",
+			WordListID:  "bb8938cb-0289-4ed4-9b5e-408d309739ad",
 			Word:        "monster",
 			Meaning:     "モンスター",
 			Explanation: "Unleash Your Monster",
@@ -1132,7 +1321,7 @@ func Test単語取得複数(t *testing.T) {
 		},
 		{
 			ID:          "word28ca-0289-4ed4-9b5e-408d309739ad",
-			WordListID:  "5f52039d-d983-4ebd-90b2-e3e04f821896",
+			WordListID:  "bb8938cb-0289-4ed4-9b5e-408d309739ad",
 			Word:        "energy",
 			Meaning:     "エナジー",
 			Explanation: "Inject inside your body",
@@ -1145,7 +1334,7 @@ func Test単語取得複数(t *testing.T) {
 		defer rg.WordR.RemoveWordByID(w.ID)
 	}
 
-	req2 := httptest.NewRequest(http.MethodGet, "/api/word/"+ws[0].WordListID, nil)
+	req2 := httptest.NewRequest(http.MethodGet, "/api/word/wordlist/"+ws[0].WordListID, nil)
 	req2.Header.Set("Content-Type", "application/json")
 	req2.Header.Set("X-User-ID", userID)
 	req2.Header.Set("Authorization", "Bearer "+tokenRes.Token)
@@ -1153,7 +1342,7 @@ func Test単語取得複数(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var wsRes wordsResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -1162,14 +1351,10 @@ func Test単語取得複数(t *testing.T) {
 	}
 
 	assert.Equal(t, http.StatusOK, rec2.Code)
-	assert.Equal(t, 7, wsRes.Matched)
+	assert.Equal(t, 2, wsRes.Matched)
+	idList := []string{ws[0].WordListID, ws[1].WordListID}
 	for i := 0; i < 2; i++ {
-		assert.Equal(t, ws[i].WordListID, wsRes.Words[len(wsRes.Words)-2+i].WordListID)
-		assert.Equal(t, ws[i].Word, wsRes.Words[len(wsRes.Words)-2+i].Word)
-		assert.Equal(t, ws[i].Meaning, wsRes.Words[len(wsRes.Words)-2+i].Meaning)
-		assert.Equal(t, ws[i].Explanation, wsRes.Words[len(wsRes.Words)-2+i].Explanation)
-		assert.Equal(t, ws[i].CreatedAt.Format(time.RFC3339), wsRes.Words[len(wsRes.Words)-2+i].CreatedAt.Format(time.RFC3339))
-		assert.Equal(t, ws[i].UpdatedAt.Format(time.RFC3339), wsRes.Words[len(wsRes.Words)-2+i].UpdatedAt.Format(time.RFC3339))
+		assert.Contains(t, idList, wsRes.Words[len(wsRes.Words)-2+i].WordListID)
 	}
 }
 
@@ -1189,27 +1374,43 @@ func Test単語取得複数単語帳IDが存在しない(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語のリスト作成
@@ -1247,7 +1448,7 @@ func Test単語取得複数単語帳IDが存在しない(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var wsRes wordsResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -1274,27 +1475,43 @@ func Test単語更新(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語帳作成
@@ -1328,7 +1545,7 @@ func Test単語更新(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var wRes wordResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -1362,27 +1579,43 @@ func Test単語更新ID不一致(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語帳作成
@@ -1437,27 +1670,43 @@ func Test単語削除(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語作成
@@ -1503,27 +1752,43 @@ func Test単語削除ID不一致(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語作成
@@ -1567,27 +1832,43 @@ func Test単語削除単語帳の削除(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語のリスト作成
@@ -1646,27 +1927,43 @@ func Test単語削除単語帳IDが見つからない(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語のリスト作成
@@ -1726,30 +2023,46 @@ func Testスコア作成(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
 	}
 
-	// 単語帳作成
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
+	}
+
+	// スコア作成
 	s := &model.Score{
 		ID:             "",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
@@ -1771,7 +2084,7 @@ func Testスコア作成(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var sRes scoreResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -1799,30 +2112,46 @@ func Testスコア取得(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
 	}
 
-	// 単語帳作成
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
+	}
+
+	// スコア作成
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
@@ -1843,7 +2172,7 @@ func Testスコア取得(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var ssRes scoresResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -1878,30 +2207,46 @@ func Testスコア取得単語帳IDが存在しない(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
 	}
 
-	// 単語帳作成
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
+	}
+
+	// スコア作成
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
@@ -1923,7 +2268,7 @@ func Testスコア取得単語帳IDが存在しない(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var ssRes scoresResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -1951,30 +2296,46 @@ func Test最新スコア取得(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
 	}
 
-	// 単語帳作成
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
+	}
+
+	// スコア作成
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
@@ -1995,7 +2356,7 @@ func Test最新スコア取得(t *testing.T) {
 
 	r.Router.ServeHTTP(rec2, req2)
 	var sRes scoreResponse
-	body, err = ioutil.ReadAll(rec2.Body)
+	body, err := ioutil.ReadAll(rec2.Body)
 	if err != nil {
 		t.FailNow()
 	}
@@ -2029,30 +2390,46 @@ func Test最新スコア取得単語帳IDが存在しない(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
 	}
 
-	// 単語帳作成
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
+	}
+
+	// スコア作成
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
@@ -2093,33 +2470,61 @@ func Testスコア削除(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語帳作成
+	wl := model.WordList{
+		ID:          "bb8938cb-0289-4ed4-9b5e-408d309739ad",
+		UserID:      userID,
+		Title:       "TOEIC",
+		Explanation: "TOEIC勉強用の単語帳です。",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	rg.WordListR.CreateWordList(wl)
+	defer rg.WordListR.RemoveWordListByID(wl.ID)
+
+	// スコア作成
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
-		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
+		WordListID:     "bb8938cb-0289-4ed4-9b5e-408d309739ad",
 		PlayCount:      1,
 		ClearTypeCount: 140,
 		MissTypeCount:  40,
@@ -2129,7 +2534,7 @@ func Testスコア削除(t *testing.T) {
 	rg.ScoreR.CreateScore(s)
 	defer rg.ScoreR.RemoveScoreByID(s.ID)
 
-	req2 := httptest.NewRequest(http.MethodDelete, "/api/score/"+s.ID, nil)
+	req2 := httptest.NewRequest(http.MethodDelete, "/api/score/"+s.WordListID, nil)
 	req2.Header.Set("Content-Type", "application/json")
 	req2.Header.Set("X-User-ID", userID)
 	req2.Header.Set("Authorization", "Bearer "+tokenRes.Token)
@@ -2139,8 +2544,8 @@ func Testスコア削除(t *testing.T) {
 
 	assert.Equal(t, http.StatusNoContent, rec2.Code)
 
-	_, err = rg.ScoreR.FIndLatestScoreByWordListID(s.ID)
-	assert.EqualError(t, err, "ID[score28c-0289-4ed4-9b5e-408d309739ad]の単語帳の最新のスコアが見つかりません。: sql: no rows in result set")
+	_, err = rg.ScoreR.FIndLatestScoreByWordListID(s.WordListID)
+	assert.EqualError(t, err, "ID[bb8938cb-0289-4ed4-9b5e-408d309739ad]の単語帳の最新のスコアが見つかりません。: sql: no rows in result set")
 }
 
 func Testスコア削除単語帳IDが存在しない(t *testing.T) {
@@ -2159,33 +2564,61 @@ func Testスコア削除単語帳IDが存在しない(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
+	}
+
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
+
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
 	}
 
 	// 単語帳作成
+	wl := model.WordList{
+		ID:          "bb8938cb-0289-4ed4-9b5e-408d309739ad",
+		UserID:      userID,
+		Title:       "TOEIC",
+		Explanation: "TOEIC勉強用の単語帳です。",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	rg.WordListR.CreateWordList(wl)
+	defer rg.WordListR.RemoveWordListByID(wl.ID)
+
+	// スコア作成
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
-		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
+		WordListID:     "bb8938cb-0289-4ed4-9b5e-408d309739ad",
 		PlayCount:      1,
 		ClearTypeCount: 140,
 		MissTypeCount:  40,
@@ -2207,7 +2640,7 @@ func Testスコア削除単語帳IDが存在しない(t *testing.T) {
 	assert.Equal(t, http.StatusNoContent, rec2.Code)
 
 	scores, err := rg.ScoreR.FindScoreByWordListID(s.WordListID)
-	assert.Equal(t, 2, len(scores))
+	assert.Equal(t, 1, len(scores))
 }
 
 // Test単語がある状態の単語帳を削除
@@ -2227,32 +2660,84 @@ func Test単語がある状態の単語帳を削除(t *testing.T) {
 	r.Init(rg)
 
 	// ログイン
-	userID := "riku"
-	password := "riku"
-	jsonBlob1 := []byte(fmt.Sprintf(`{
-			"password": "%s"
-		}`, password))
-	req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
-	req1.Header.Set("Content-Type", "application/json")
-	req1.Header.Set("X-User-ID", userID)
-	rec1 := httptest.NewRecorder()
-
-	r.Router.ServeHTTP(rec1, req1)
-
-	assert.Equal(t, http.StatusOK, rec1.Code)
-
 	var tokenRes tokenResponse
-	body, err := ioutil.ReadAll(rec1.Body)
-	if err != nil {
-		t.FailNow()
+	userID := "riku"
+	isLoggedIn := true
+	token, apierr := rg.TokenR.FindLatestTokenByUserID(userID)
+	if apierr != nil {
+		isLoggedIn = false
 	}
-	if err := json.Unmarshal(body, &tokenRes); err != nil {
-		t.FailNow()
+	if token != nil {
+		valid := time.Now()
+		if valid.After(token.ExpiredAt) {
+			isLoggedIn = false
+		}
 	}
 
-	wls, _ := rg.WordListR.FindWordListByUserID(userID)
+	if !isLoggedIn {
+		password := "riku"
+		jsonBlob1 := []byte(fmt.Sprintf(`{
+				"password": "%s"
+			}`, password))
+		req1 := httptest.NewRequest(http.MethodPost, "/api/user/login", bytes.NewBuffer(jsonBlob1))
+		req1.Header.Set("Content-Type", "application/json")
+		req1.Header.Set("X-User-ID", userID)
+		rec1 := httptest.NewRecorder()
 
-	req2 := httptest.NewRequest(http.MethodDelete, "/api/wordlist/"+wls[0].ID, nil)
+		r.Router.ServeHTTP(rec1, req1)
+
+		assert.Equal(t, http.StatusOK, rec1.Code)
+
+		body, err := ioutil.ReadAll(rec1.Body)
+		if err != nil {
+			t.FailNow()
+		}
+		if err := json.Unmarshal(body, &tokenRes); err != nil {
+			t.FailNow()
+		}
+	} else {
+		tokenRes.Token = token.Token
+	}
+
+	// 単語帳作成
+	wl := model.WordList{
+		ID:          "bb8938cb-0289-4ed4-9b5e-408d309739ad",
+		UserID:      userID,
+		Title:       "TOEIC",
+		Explanation: "TOEIC勉強用の単語帳です。",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	rg.WordListR.CreateWordList(wl)
+	defer rg.WordListR.RemoveWordListByID(wl.ID)
+
+	// 単語作成
+	w := model.Word{
+		ID:          "word38ca-0289-4ed4-9b5e-408d309739ad",
+		WordListID:  "bb8938cb-0289-4ed4-9b5e-408d309739ad",
+		Word:        "inevitable",
+		Meaning:     "inevitable means you cannot avoid",
+		Explanation: "Your undoing is now inevitable.",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	rg.WordR.CreateWord(w)
+	defer rg.WordR.RemoveWordByID(w.ID)
+
+	// スコア作成
+	s := model.Score{
+		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
+		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
+		PlayCount:      1,
+		ClearTypeCount: 140,
+		MissTypeCount:  40,
+		CorrectRate:    0.95,
+		PlayedAt:       time.Now(),
+	}
+	rg.ScoreR.CreateScore(s)
+	defer rg.ScoreR.RemoveScoreByID(s.ID)
+
+	req2 := httptest.NewRequest(http.MethodDelete, "/api/wordlist/"+wl.ID, nil)
 	req2.Header.Set("Content-Type", "application/json")
 	req2.Header.Set("X-User-ID", userID)
 	req2.Header.Set("Authorization", "Bearer "+tokenRes.Token)
@@ -2262,6 +2747,12 @@ func Test単語がある状態の単語帳を削除(t *testing.T) {
 
 	assert.Equal(t, http.StatusNoContent, rec2.Code)
 
-	_, err = rg.WordListR.FindWordListByID(wls[0].ID)
+	_, err = rg.WordListR.FindWordListByID(wl.ID)
 	assert.EqualError(t, err, "単語帳が見つかりません。: sql: no rows in result set")
+
+	_, err = rg.WordR.FindWordByID(w.ID)
+	assert.EqualError(t, err, "ID[word38ca-0289-4ed4-9b5e-408d309739ad]の単語が見つかりません。: sql: no rows in result set")
+
+	_, err = rg.ScoreR.FIndLatestScoreByWordListID(wl.ID)
+	assert.EqualError(t, err, "ID[bb8938cb-0289-4ed4-9b5e-408d309739ad]の単語帳の最新のスコアが見つかりません。: sql: no rows in result set")
 }

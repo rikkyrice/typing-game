@@ -15,6 +15,8 @@ const selectTokenByUserIDQuery string = `
 	SELECT *
 	FROM token
 	WHERE user_id = ?
+	ORDER BY created_at desc
+	FETCH FIRST 1 ROWS ONLY
 `
 
 const insertTokenQuery string = `
@@ -60,7 +62,7 @@ type tokenRepository struct {
 	deleteTokenByUserIDPstmt *sql.Stmt
 }
 
-func (tR *tokenRepository) FindTokenByUserID(userID string) (*model.Token, *apierror.Error) {
+func (tR *tokenRepository) FindLatestTokenByUserID(userID string) (*model.Token, *apierror.Error) {
 	var token model.Token
 
 	if err := tR.selectTokenByUserIDPstmt.QueryRow(userID).Scan(&token.Token, &token.UserID, &token.CreatedAt, &token.ExpiredAt); err != nil {

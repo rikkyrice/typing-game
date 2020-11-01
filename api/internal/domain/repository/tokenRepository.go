@@ -8,7 +8,7 @@ import (
 // TokenRepository トークンのリポジトリインターフェース
 type TokenRepository interface {
 	// FindTokenByUserID トークン取得
-	FindTokenByUserID(userID string) (*model.Token, *apierror.Error)
+	FindLatestTokenByUserID(userID string) (*model.Token, *apierror.Error)
 	// StoreToken トークン作成
 	StoreToken(t *model.Token) *apierror.Error
 	// RemoveTokenByUserID トークン削除
