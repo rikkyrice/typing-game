@@ -3,7 +3,7 @@ RUN yum -y update && yum clean all
 # 言語設定
 RUN sed -i -e '/override_install_langs/s/$/,ja_JP.utf8/g' /etc/yum.conf
 ## デフォルトで
-RUN curl http://mirror.centos.org/centos/7/os/x86_64/Packages/glibc-common-2.17-307.el7.1.x86_64.rpm > /tmp/glibc-common.rpm
+RUN curl http://mirror.centos.org/centos/7/os/x86_64/Packages/glibc-common-2.17-317.el7.x86_64.rpm > /tmp/glibc-common.rpm
 RUN rpm -Uvh --force /tmp/glibc-common.rpm
 RUN yum -y install ibus-kkc vlgothic-fonts vlgothic-p-fonts
 RUN localedef -f UTF-8 -i ja_JP ja_JP.UTF-8
