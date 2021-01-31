@@ -1,0 +1,240 @@
+﻿// global styles
+
+// content width styles
+.iwd-desktop-width {
+  max-width: 960px;
+}
+
+.iwd-mobile-width {
+  max-width: 600px;
+}
+
+// word-break style
+.word-break {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+.text-overflow-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// scroll bar styles
+.disable-windows-scrollbar {
+  // Firefox
+  overflow: -moz-scrollbars-none;
+
+  // Google Chrome
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // IE
+  -ms-overflow-style: none;
+}
+
+// sticky style
+.sticky {
+  position: sticky;
+  position: -webkit-sticky;
+}
+
+// background styles
+.iwd-gradient-bg {
+  background: linear-gradient(90deg, #5bc4da, #006699) !important;
+}
+
+.iwd-white-bg {
+  background-color: #ffffff !important;
+}
+
+.iwd-primary-bg {
+  background-color: #333333 !important;
+}
+
+.iwd-secondary-bg {
+  background-color: #666666 !important;
+}
+
+.iwd-disabled-bg {
+  background-color: #f2f2f2 !important;
+}
+
+.hover-animation-button {
+  transition: 0.3s;
+}
+.hover-animation-button:hover {
+  color: white !important;
+}
+.hover-animation-button::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0 !important;
+  content: '';
+  background: #006699 !important;
+  transform-origin: center center;
+  transform: scale(0, 0);
+  transition: 0.3s;
+}
+.hover-animation-button:hover::before {
+  transform: scale(1, 1);
+  opacity: 1 !important;
+}
+
+// rotate style
+.rotate-180 {
+  transform: rotate(-180deg);
+  transition: 0.3s;
+}
+
+.rotate-90 {
+  transform: rotate(-90deg);
+  transition: 0.3s;
+}
+
+.rotate-45 {
+  transform: rotate(-45deg);
+  transition: 0.3s;
+}
+
+// color style
+.main-light-color {
+  color: #3384ad;
+}
+
+.main-color {
+  color: #006699;
+}
+
+.main-dark-color {
+  color: #00517a;
+}
+
+.main-pale-color {
+  color: #e5eff5;
+}
+
+.sub-light-color {
+  color: #33b6d1;
+}
+
+.sub-color {
+  color: #33b6d1;
+}
+
+.sub-dark-color {
+  color: #2891a7;
+}
+
+.sub-pale-color {
+  color: #33b6d1;
+  opacity: 0.1;
+}
+
+.accent-color {
+  color: #feb0b0;
+}
+
+.accent-light-color {
+  color: #fec0c0;
+}
+
+.accent-dark-color {
+  color: #cb8d8d;
+}
+
+.accent-pale-color {
+  color: #feb0b0;
+  opacity: 0.1;
+}
+
+.black-100-color {
+  color: #000;
+}
+
+.black-80-color {
+  color: #000;
+  opacity: 0.8;
+}
+
+.black-60-color {
+  color: #000;
+  opacity: 0.6;
+}
+
+.black-40-color {
+  color: #000;
+  opacity: 0.4;
+}
+
+.black-30-color {
+  color: #000;
+  opacity: 0.3;
+}
+
+.black-10-color {
+  color: #000;
+  opacity: 0.1;
+}
+
+.white-100-color {
+  color: #fff;
+}
+
+.white-80-color {
+  color: #fff;
+  opacity: 0.8;
+}
+
+.white-60-color {
+  color: #fff;
+  opacity: 0.6;
+}
+
+.white-40-color {
+  color: #fff;
+  opacity: 0.4;
+}
+
+.white-30-color {
+  color: #fff;
+  opacity: 0.3;
+}
+
+.white-10-color {
+  color: #fff;
+  opacity: 0.1;
+}
+
+.mono-60-color {
+  color: #666;
+  opacity: 0.6;
+}
+
+.mono-30-color {
+  color: #b2b2b2;
+}
+
+.mono-10-color {
+  color: #e5e5e5;
+}
+
+.mono-5-color {
+  color: #f2f2f2;
+}
+
+.alert-color {
+  color: #e32d2d;
+}
+
+// font weight style
+
+.bold {
+  font-weight: 600;
+}

@@ -1,26 +1,26 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Home from "../views/Home.vue";
+import Vue from 'vue';
+import Router from 'vue-router';
+import routes from '@/router/router';
+import { PAGES } from '@/router/pages';
+import store from '@/store';
 
-const routes: Array<RouteRecordRaw> = [
-  {
-    path: "/",
-    name: "Home",
-    component: Home
+Vue.use(Router);
+
+const router = new Router({
+  mode: 'history',
+  base: process.env.VUE_APP_PUBLIC_PATH,
+  routes,
+  scrollBehavior() {
+    return { x: 0, y: 0 };
   },
-  {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue")
-  }
-];
+});
 
-const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes
+router.beforeEach((to, from, next) => {
+  if (to.fullPath === from.fullPath && to.meta.title === from.meta.title) {
+    return;
+  }
+  const isAfterLogin = !from.name && to.name === PAGES.TOP && !!to.hash;
+  next();
 });
 
 export default router;
