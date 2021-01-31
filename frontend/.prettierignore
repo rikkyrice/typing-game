@@ -1,0 +1,4 @@
+node_module/**/*.d.ts
+node_module/**/*.js
+dist/**/*.js
+src/generated/api-client/*.ts
