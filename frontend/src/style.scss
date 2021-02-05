@@ -1,11 +1,11 @@
 ﻿// global styles
 
 // content width styles
-.iwd-desktop-width {
+.lwtg-desktop-width {
   max-width: 960px;
 }
 
-.iwd-mobile-width {
+.lwtg-mobile-width {
   max-width: 600px;
 }
 
@@ -45,46 +45,36 @@
 }
 
 // background styles
-.iwd-gradient-bg {
-  background: linear-gradient(90deg, #5bc4da, #006699) !important;
+.lwtg-gradient-bg {
+  background: linear-gradient(90deg, #E2F0D9, #A0D0A0) !important;
 }
 
-.iwd-white-bg {
+.lwtg-white-bg {
   background-color: #ffffff !important;
 }
 
-.iwd-primary-bg {
-  background-color: #333333 !important;
+.lwtg-primary-bg {
+  background-color: #A0D0A0 !important;
 }
 
-.iwd-secondary-bg {
-  background-color: #666666 !important;
+.lwtg-secondary-bg {
+  background-color: #E2F0D9 !important;
 }
 
-.iwd-disabled-bg {
+.lwtg-disabled-bg {
   background-color: #f2f2f2 !important;
 }
 
 .hover-animation-button {
-  transition: 0.3s;
+  background: linear-gradient(to right, #A0D0A0 50%, #fff 50%);
+  background-size: 200% 100.5%;
+  background-position: right bottom;
+  border-left: 0.20em solid #A0D0A0;
+  transition: all .5s ease-out;
 }
 .hover-animation-button:hover {
+  background-position: left bottom;
   color: white !important;
-}
-.hover-animation-button::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 0 !important;
-  content: '';
-  background: #006699 !important;
-  transform-origin: center center;
-  transform: scale(0, 0);
-  transition: 0.3s;
-}
-.hover-animation-button:hover::before {
-  transform: scale(1, 1);
-  opacity: 1 !important;
 }
 
 // rotate style
