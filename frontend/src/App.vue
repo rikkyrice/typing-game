@@ -1,6 +1,18 @@
 <template>
   <div id="app">
     <v-app>
+      <!-- System Bar -->
+      <!-- <v-system-bar app /> -->
+      <!-- Snackbar -->
+      <lwtg-snackbar v-model="snackbarVisibility" :text="snackbarInfo.message" />
+      <!-- HeaderNav Bar -->
+      <header-navbar
+        :nav-item-list="navItemList"
+        @open-side-navbar="openSideNavbar"
+      />
+      <!-- Side Bar -->
+      <!-- <v-navigation-drawer app /> -->
+      <side-navbar ref="side-navbar" :nav-item-list="navItemList" />
       <v-main id="main">
         <router-view />
       </v-main>
@@ -11,14 +23,42 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import Toasted from 'vue-toasted';
+import LwtgSnackbar from '@/components/atoms/LwtgSnackbar.vue';
+import HeaderNavbar from '@/components/molecules/HeaderNavbar.vue';
+import SideNavbar from '@/components/molecules/SideNavbar.vue';
+import { NavItemInfo } from '@/models/types/navItemInfo';
+import store from '@/store';
+import { SnackbarInfo } from '@/store/types';
+import { TYPES } from '@/store/mutation-types';
 
 Vue.use(Toasted, {
   position: 'top-center',
   duration: 3000,
 });
 
-@Component
+@Component({
+  components: { LwtgSnackbar, HeaderNavbar, SideNavbar },
+})
 export default class App extends Vue {
+  navItemList: NavItemInfo[] = [
+    { type: 'img', label: require('@/assets/lwtg-logo-3.svg'), path: '/' },
+    { type: 'span', label: 'PlayGround', path: '/pg' },
+  ];
+
+  get snackbarInfo() {
+    return store.state.snackbar;
+  }
+  get snackbarVisibility() {
+    return this.snackbarInfo.visibility;
+  }
+  set snackbarVisibility(visibility: boolean) {
+    store.dispatch(TYPES.SNACKBAR, '');
+  }
+
+  openSideNavbar() {
+    const sideNavbar: any = this.$refs['side-navbar'];
+    sideNavbar.openSideNavbar();
+  }
 }
 </script>
 
@@ -26,7 +66,7 @@ export default class App extends Vue {
 @import '@/style.scss';
 // global styles
 #app {
-  font-family: 'HiraginoSans-W3', 'Meiryo UI', sans-serif !important;
+  font-family: '游ゴシック', 'HiraginoSans-W3', 'Meiryo UI', sans-serif !important;
   min-height: 100vh;
 }
 #main {
