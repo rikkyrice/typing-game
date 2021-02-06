@@ -3,7 +3,6 @@
     <template v-if="$vuetify.breakpoint.xsOnly">
       <v-row style="position: relative;">
         <v-icon
-          v-if="!isLoginPage"
           style="position: absolute; top: 17px; left: 16px;"
           @click="$emit('open-side-navbar')"
           >mdi-menu</v-icon
@@ -20,16 +19,13 @@
       <div
         v-for="(navItem, index) in navItemList"
         :key="navItem.path"
-        v-ripple="navItem.type !== 'btn' && !isLoginPage"
+        v-ripple="true"
         class="px-2 mx-2"
         :class="{
           'mr-auto': index === 0,
-          'header-nav-item':
-            navItem.type !== 'btn' &&
-            !isCurrentPage(navItem.path) &&
-            !isLoginPage,
-          'current-nav-item':
-            navItem.type !== 'btn' && isCurrentPage(navItem.path) && index > 0,
+          'header-nav-item': !isCurrentPage(navItem.path),
+          'current-nav-item': isCurrentPage(navItem.path) && index > 0,
+          'main-color' : isCurrentPage(navItem.path) && index === 0,
         }"
         @click="pageTransition(navItem.path)"
       >
@@ -37,8 +33,8 @@
           class="d-flex align-center justify-center"
         >
           <span
-            v-if="navItem.type === 'span' && !isLoginPage"
-            class="mx-auto"
+            v-if="navItem.type === 'span'"
+            class="mx-auto bold"
             >{{ navItem.label }}</span
           >
           <img
@@ -60,23 +56,17 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component';
 import UtilMixin from '@/mixins/utilMixin';
 import { NavItemInfo } from '@/models/types/navItemInfo';
-import { PAGES } from '@/router/pages';
 
 @Component
 export default class HeaderNavbar extends mixins(UtilMixin) {
   @Prop() navItemList!: NavItemInfo[];
-  drawerVisibility = false;
-
-  get isLoginPage() {
-    return this.$route.name === PAGES.LOGIN;
-  }
 
   isCurrentPage(path: string) {
     return this.$route.path === path;
   }
 
   pageTransition(path: string) {
-    if (!this.isCurrentPage(path) && !this.isLoginPage) {
+    if (!this.isCurrentPage(path)) {
       this.$router.push(path);
     }
   }
@@ -86,6 +76,7 @@ export default class HeaderNavbar extends mixins(UtilMixin) {
 <style scoped lang="scss">
 @import '@/style.scss';
 .current-nav-item {
+  color: #A0D0A0;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -100,11 +91,6 @@ export default class HeaderNavbar extends mixins(UtilMixin) {
     position: absolute;
     bottom: -4px;
     background: linear-gradient(90deg, #E2F0D9, #A0D0A0);
-  }
-  &:hover {
-    color: #A0D0A0;
-    -webkit-transition-duration: 0.3s;
-    transition-duration: 0.3s;
   }
 }
 .header-nav-item {
