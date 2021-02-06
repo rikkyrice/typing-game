@@ -1,7 +1,7 @@
 <template>
   <div
     id="breads-wrapper"
-    class="d-flex align-center text--secoundary"
+    class="d-flex align-center text--secondary"
     style="font-size: 12px;"
   >
     <div
