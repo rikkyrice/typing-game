@@ -57,6 +57,6 @@ export default class SideNavbar extends mixins(UtilMixin) {
 @import '@/style.scss';
 .current-page {
   color: white;
-  background: #006699;
+  background: #A0D0A0;
 }
 </style>
