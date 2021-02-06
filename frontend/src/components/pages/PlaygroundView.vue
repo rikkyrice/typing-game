@@ -1,5 +1,5 @@
 <template>
-  <div id="my-page">
+  <div id="playground">
     <!-- パンくずリスト -->
     <lwtg-content>
       <lwtg-breadcrumbs
