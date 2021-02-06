@@ -8,6 +8,7 @@
     :color="_color"
     :height="MdSmXsUtil(height, height, '')"
     :dark="dark"
+    :ripple="{class: 'white--text'}"
     :x-large="size === 'x-large'"
     :large="size === 'large'"
     :small="size === 'small'"
