@@ -4,20 +4,20 @@
       <span
         class="bold"
         style="color: #A0D0A0;"
-        :style="fontSizeUtil(24, 24, 18)"
+        :style="fontSizeUtil(24, 24, 20)"
       >{{ formItem.title }}</span>
     </template>
     <template #form-comment>
       <div>
-        <span :style="fontSizeUtil(10, 10, 8)"
+        <span :style="fontSizeUtil(12, 12, 10)"
         >{{ formItem.comment }}</span>
       </div>
       <div
-        class="page-link pl-1"
+        class="page-link pl-1 bold"
         @click="pageTransition()"
       >
         <span
-          :style="fontSizeUtil(10, 10, 8)"
+          :style="fontSizeUtil(12, 12, 10)"
           style="color: #A0D0A0;"
         >{{ formItem.link }}</span>
       </div>
@@ -76,7 +76,7 @@ import { FormItem } from '@/models/types/formItem';
   },
 })
 export default class LwtgSignupForm extends mixins(UtilMixin) {
-  formItem: FormItem = { title: '登録', comment: '既に登録済みの方は', link: 'ログイン', path: '/' };
+  formItem: FormItem = { title: '登録', comment: '既に登録済みの方は', link: 'ログイン', path: '/login' };
 
   pageTransition() {
     this.$router.push(this.formItem.path);
