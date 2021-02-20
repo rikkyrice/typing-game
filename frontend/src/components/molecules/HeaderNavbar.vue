@@ -1,5 +1,13 @@
 <template>
-  <v-app-bar app fixed hide-on-scroll elevation="1" color="white" style="max-height: 64px;">
+  <v-app-bar
+    app
+    :extended="isWordsPage"
+    :extension-height="isWordsPage ? '82px' : '0px'"
+    hide-on-scroll
+    elevation="1"
+    color="white"
+    style="max-height: 64px;"
+  >
     <template v-if="$vuetify.breakpoint.xsOnly">
       <v-row style="position: relative;">
         <v-icon
@@ -48,6 +56,11 @@
         </div>
       </div>
     </template>
+    <template v-if="isWordsPage" v-slot:extension>
+      <div style="width: 100%; height: 100%;">
+        <filter-expansion-panel />
+      </div>
+    </template>
   </v-app-bar>
 </template>
 
@@ -56,10 +69,20 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component';
 import UtilMixin from '@/mixins/utilMixin';
 import { NavItemInfo } from '@/models/types/navItemInfo';
+import { PAGES } from '@/router/pages';
+import FilterExpansionPanel from '@/components/molecules/FilterExpansionPanel.vue';
 
-@Component
+@Component({
+  components: {
+    FilterExpansionPanel,
+  },
+})
 export default class HeaderNavbar extends mixins(UtilMixin) {
   @Prop() navItemList!: NavItemInfo[];
+
+  get isWordsPage() {
+    return this.$route.name === PAGES.WORDLIST || this.$route.name === PAGES.PLAYGROUND;
+  }
 
   isCurrentPage(path: string) {
     return this.$route.path === path;
