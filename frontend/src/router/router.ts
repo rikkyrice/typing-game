@@ -23,6 +23,27 @@ export default [
     props: true,
   },
   {
+    path: '/mypage',
+    name: PAGES.MYPAGE,
+    component: () => import('@/components/pages/MyPageView.vue'),
+    meta: { title: 'MYPAGE', saveScroll: false },
+    props: true,
+  },
+  {
+    path: '/mypage/:wordlistId',
+    name: PAGES.WORDLIST,
+    component: () => import('@/components/pages/WordListView.vue'),
+    meta: { title: 'WORDLIST', saveScroll: false },
+    props: true,
+  },
+  {
+    path: '/mypage/:wordlistId/typing-game',
+    name: PAGES.TYPINGGAME,
+    component: () => import('@/components/pages/TypingGameView.vue'),
+    meta: { title: 'TYPINGGAME', saveScroll: false },
+    props: true,
+  },
+  {
     path: '/pg',
     name: PAGES.PLAYGROUND,
     component: () => import('@/components/pages/PlaygroundView.vue'),
