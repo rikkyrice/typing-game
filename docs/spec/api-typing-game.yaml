@@ -1202,8 +1202,13 @@ components:
     GetWords:
       type: object
       required:
+        - matched
         - words
       properties:
+        matched:
+          type: integer
+          description: マッチした単語の数
+          example: 1
         words:
           type: array
           description: 単語
