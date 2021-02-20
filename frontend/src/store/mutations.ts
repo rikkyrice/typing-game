@@ -9,10 +9,6 @@ const mutations: MutationTree<State> = {
   shiftTypeMeaning(state: State, typeWord: TypeWord) {
     state.typeWord.typeMeaning = typeWord;
   },
-  resetGame(state: State) {
-    state.typeWord.typeWord = new TypeWord('', '', [[]]);
-    state.typeWord.typeMeaning = new TypeWord('', '', [[]]);
-  }
 };
 
 export default mutations;

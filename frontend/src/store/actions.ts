@@ -10,9 +10,6 @@ const actions: ActionTree<State, State> = {
   [TYPES.SHIFT_TYPEMEANING]({ commit }, typeWord: TypeWord) {
     commit('shiftTypeMeaning', typeWord);
   },
-  [TYPES.RESET_GAME]({ commit }) {
-    commit('resetGame');
-  }
 }
 
 export default actions;
