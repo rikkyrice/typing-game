@@ -8,6 +8,7 @@ export interface Word {
   word: string;
   yomi: string;
   meaning: string;
+  mYomi: string;
   explanation: string;
   isRemembered: boolean;
   createdAt: string;
