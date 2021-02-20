@@ -4,11 +4,21 @@
     class="d-flex justify-center align-center"
     style="width: 100%; height: 100%;"
   >
+    <div
+      v-if="!isWords"
+      style="height: 100%;"
+      :style="{
+        width: (width / 9) + 'px',
+      }"
+    />
     <lwtg-word-card
       :width="width"
       :border="border"
       :primary="primary"
       class="lwtg-word-card"
+      :class="{
+        'meaning-card': !isWords,
+      }"
     >
       <template #word>
         <div
@@ -25,16 +35,16 @@
               @shift="shift"
             />
             <span
-              v-if="clear"
+              v-else
               class="bold main-mono-color"
-              :style="fontSizeUtil(24, 24, 32)"
+              :style="fontSizeUtil(48, 48, 32)"
             >Clear!</span>
           </div>
         </div>
         <div
           v-else
           style="width: 100%; height: 100%;"
-          class="d-flex justify-center align-center"
+          class="d-flex justify-center align-center meaning-card"
         >
           <div>
             <lwtg-typing-game
@@ -42,17 +52,29 @@
               :key="key"
               :typeWord="typeWord"
               :isActivated="isActivated"
+              :wordOnly="wordOnly"
               @shift="shift"
             />
             <v-divider />
             <span
-              class="bold main-mono-color"
+              v-if="!clear"
+              :class="{
+                'main-mono-color': isActivated || wordOnly,
+                'mono-30-color': !isActivated && !wordOnly,
+              }"
               :style="fontSizeUtil(24, 24, 32)"
             >{{ words[index].explanation }}</span>
           </div>
         </div>
       </template>
     </lwtg-word-card>
+    <div
+      v-if="isWords"
+      style="height: 100%;"
+      :style="{
+        width: (width / 9) + 'px',
+      }"
+    />
   </div>
 </template>
 
@@ -81,6 +103,7 @@ export default class TypingWordCard extends mixins(UtilMixin) {
   @Prop() words!: Word[];
   @Prop() isActivated!: boolean;
   @Prop({ default: true }) isWords!: boolean;
+  @Prop() wordOnly!: boolean;
   typeWords: TypeWord[] = [];
   clear: boolean = false;
   index = 0;
@@ -114,7 +137,7 @@ export default class TypingWordCard extends mixins(UtilMixin) {
       if (typingWordCardWidth > 1000) {
         this.width = 1000;
       } else {
-        this.width = typingWordCardWidth;
+        this.width = typingWordCardWidth - (typingWordCardWidth / 9);
       }
     }
   }
@@ -124,6 +147,7 @@ export default class TypingWordCard extends mixins(UtilMixin) {
   shiftIndex() {
     this.index += 1;
     if (this.index === this.typeWords.length) {
+      // this.reset();
       this.clear = true;
     } else {
       this.dipatchTypeWord();
@@ -245,4 +269,7 @@ export default class TypingWordCard extends mixins(UtilMixin) {
 
 <style scoped lang="scss">
 @import '@/style.scss';
+.meaning-card {
+  transform: rotateY(180deg);
+}
 </style>
