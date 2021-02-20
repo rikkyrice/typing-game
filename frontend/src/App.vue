@@ -7,7 +7,6 @@
       <lwtg-snackbar v-model="snackbarVisibility" :text="snackbarInfo.message" />
       <!-- HeaderNav Bar -->
       <header-navbar
-        class="px-6"
         :nav-item-list="navItemList"
         @open-side-navbar="openSideNavbar"
       />
@@ -43,6 +42,7 @@ Vue.use(Toasted, {
 export default class App extends Vue {
   navItemList: NavItemInfo[] = [
     { type: 'img', label: require('@/assets/lwtg-logo-3.svg'), path: '/' },
+    { type: 'span', label: 'マイページ', path: '/mypage' },
     { type: 'span', label: 'ユーザー登録', path: '/signup' },
     { type: 'span', label: 'ログイン', path: '/login' },
     { type: 'span', label: 'PlayGround', path: '/pg' },
