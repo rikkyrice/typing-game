@@ -30,11 +30,12 @@
         <v-spacer />
         <v-col cols="10">
           <typing-word-card
-            ref="child"
+            ref="childWords"
             :border="'10'"
             :primary="true"
             :words="wordArray.words"
-            :isActivated="true"
+            :isActivated="shiftController"
+            @shift="shift"
           />
         </v-col>
         <v-col cols="1">
@@ -47,6 +48,21 @@
           </div>
         </v-col>
       </v-row>
+      <v-row>
+        <v-spacer />
+        <v-col cols="10">
+          <typing-word-card
+            ref="childMeanings"
+            :border="'10'"
+            :primary="true"
+            :words="wordArray.words"
+            :isWords="false"
+            :isActivated="!shiftController"
+            @shift="shift"
+          />
+        </v-col>
+        <v-spacer />
+      </v-row>
     </div>
   </div>
 </template>
@@ -58,6 +74,8 @@ import UtilMixin from '@/mixins/utilMixin';
 import TypingWordCard from '@/components/organisms/card/TypingWordCard.vue';
 import { WordList } from '@/models/wordlist';
 import { WordArray } from '@/models/word';
+import store from '@/store';
+import { TYPES } from '@/store/mutation-types';
 
 @Component({
   components: {
@@ -67,11 +85,22 @@ import { WordArray } from '@/models/word';
 export default class TypingGameContent extends mixins(UtilMixin) {
   @Prop() wordList!: WordList;
   @Prop() wordArray!: WordArray;
+  shiftController = true;
   refs():any {
     return this.$refs;
   }
+  shift() {
+    this.shiftController = !this.shiftController;
+    if (this.shiftController) {
+      this.refs().childWords.shiftIndex();
+      this.refs().childMeanings.shiftIndex();
+    }
+  }
   reset() {
-    this.refs().child.reset();
+    store.dispatch(TYPES.RESET_GAME);
+    this.shiftController = true;
+    this.refs().childWords.reset();
+    this.refs().childMeanings.reset();
   }
 }
 </script>
