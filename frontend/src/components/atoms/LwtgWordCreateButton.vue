@@ -1,5 +1,5 @@
 <template>
-  <iwd-icon-button
+  <lwtg-icon-button
     icon="plus"
     :fab="true"
     :outlined="true"
@@ -15,10 +15,14 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component';
-import IwdIconButton from '@/components/atoms/IwdIconButton.vue';
+import LwtgIconButton from '@/components/atoms/LwtgIconButton.vue';
 import UtilMixin from '@/mixins/utilMixin';
 
-@Component({ components: { IwdIconButton } })
+@Component({
+  components: {
+    LwtgIconButton
+  }
+})
 export default class LwtgWordCreateButton extends mixins(UtilMixin) {
   handleClick(ev: any) {
     this.$emit('click', ev);
@@ -34,7 +38,7 @@ export default class LwtgWordCreateButton extends mixins(UtilMixin) {
 .create-word {
   position: fixed;
   right: 24px;
-  bottom: 16px;
+  bottom: 24px;
   z-index: 100;
   animation-duration: 0.4s;
 }
