@@ -12,22 +12,44 @@
     >
       <template #word>
         <div
+          v-if="isWords"
           style="width: 100%; height: 100%;"
           class="d-flex justify-center align-center"
         >
-          <div
-            v-for="(typeWord, i) in typeWords"
-            :key="i"
-          >
+          <div>
             <lwtg-typing-game
-              ref="offspring"
-              v-if="i === index"
+              v-if="!clear"
+              :key="key"
               :typeWord="typeWord"
               :isActivated="isActivated"
-              @shift="shiftIndex"
+              @shift="shift"
             />
+            <span
+              v-if="clear"
+              class="bold main-mono-color"
+              :style="fontSizeUtil(24, 24, 32)"
+            >Clear!</span>
           </div>
-          <span v-if="clear">Clear!</span>
+        </div>
+        <div
+          v-else
+          style="width: 100%; height: 100%;"
+          class="d-flex justify-center align-center"
+        >
+          <div>
+            <lwtg-typing-game
+              v-if="!clear"
+              :key="key"
+              :typeWord="typeWord"
+              :isActivated="isActivated"
+              @shift="shift"
+            />
+            <v-divider />
+            <span
+              class="bold main-mono-color"
+              :style="fontSizeUtil(24, 24, 32)"
+            >{{ words[index].explanation }}</span>
+          </div>
         </div>
       </template>
     </lwtg-word-card>
@@ -57,21 +79,31 @@ export default class TypingWordCard extends mixins(UtilMixin) {
   @Prop({ default: '10px' }) border!: number;
   @Prop() primary!: boolean;
   @Prop() words!: Word[];
-  @Prop({ default: 0 }) index!: number;
   @Prop() isActivated!: boolean;
+  @Prop({ default: true }) isWords!: boolean;
   typeWords: TypeWord[] = [];
   clear: boolean = false;
-  refs():any {
-    return this.$refs;
+  index = 0;
+  key = 0;
+  get typeWord() {
+    return this.isWords ? store.state.typeWord.typeWord : store.state.typeWord.typeMeaning;
+  }
+  dipatchTypeWord() {
+    if (this.isWords) {
+      store.dispatch(TYPES.SHIFT_TYPEWORD, this.typeWords[this.index]);
+    } else {
+      store.dispatch(TYPES.SHIFT_TYPEMEANING, this.typeWords[this.index]);
+    }
   }
   created() {
-    this.createTypeWords();
+    this.createTypeWords(this.isWords);
   }
   mounted() {
     window.addEventListener('resize', this.handleResize);
     if (!this.width) {
       this.handleResize();
     }
+    this.dipatchTypeWord();
   }
   handleResize() {
     const typingWordCard = document.getElementById(
@@ -86,39 +118,43 @@ export default class TypingWordCard extends mixins(UtilMixin) {
       }
     }
   }
+  shift() {
+    this.$emit('shift');
+  }
   shiftIndex() {
     this.index += 1;
     if (this.index === this.typeWords.length) {
       this.clear = true;
+    } else {
+      this.dipatchTypeWord();
     }
   }
   reset() {
     this.clear = false;
     this.index = 0;
-    this.refs().offspring.reset();
+    this.dipatchTypeWord();
+    this.key = this.key ? 0 : 1;
   }
   // Wordsでfor文を作成
   // Yomiがあるか、ないか判定 -> アルファベットのみの場合変換の必要がない
   // Yomiがない場合、Stringの二次元配列に変換してtypeWordsにpush
   // Yomiがある場合、まずparseして細かいひらがなの配列に変換
   // その後typing用のアルファベットに変換し、typeWordsにpush
-  createTypeWords() {
+  createTypeWords(isWords: boolean) {
     for (var i = 0; i < this.words.length; i++) {
-      var word = this.words[i].word;
-      var yomi = '';
+      var word = isWords ? this.words[i].word : this.words[i].meaning;
+      var yomi = isWords ? this.words[i].yomi : this.words[i].mYomi;
       var tw: string[][] = [];
-      if (!this.words[i].yomi) {
-        var letters = this.words[i].word.split('');
+      if (!yomi) {
+        var letters = word.split('');
         for (var j = 0; j < letters.length; j++) {
           tw[j] = [];
           tw[j].push(letters[j]);
         }
-        console.log(tw);
       } else {
-        var parsedSentence = this.parseKanaSentence(this.words[i].yomi);
+        var parsedSentence = this.parseKanaSentence(yomi);
         var typingSentence = this.convertToTypingSentences(parsedSentence);
         tw = typingSentence;
-        yomi = this.words[i].yomi;
       }
       var typeWord = new TypeWord(word, yomi, tw)
       this.typeWords.push(typeWord);
