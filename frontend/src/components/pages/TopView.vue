@@ -71,7 +71,7 @@ export default class TopView extends mixins(UtilMixin) {
       string.forEach((char, index) => {
         setTimeout(() => {
           typewriter.textContent += char;
-        }, 75 * index);
+        }, 110 * index);
       });
     }
   }
