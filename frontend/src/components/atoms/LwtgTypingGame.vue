@@ -5,8 +5,8 @@
         <span
           class="bold"
           :class="{
-            'main-mono-color': isActivated,
-            'mono-30-color': !isActivated,
+            'main-mono-color': isActivated || wordOnly,
+            'mono-30-color': !isActivated && !wordOnly,
           }"
           :style="fontSizeUtil(42, 42, 32)"
         >{{ typeWord.word }}</span>
@@ -69,6 +69,7 @@ import { TypeWord } from '@/models/types/typeWord';
 export default class LwtgTypingGame extends mixins(UtilMixin) {
   @Prop() typeWord!: TypeWord;
   @Prop() isActivated!: boolean;
+  @Prop() wordOnly!: boolean;
   typeWords = JSON.parse(JSON.stringify(this.typeWord.typeWord));
   clearedWords: string[] = [];
   typedWord = '';
