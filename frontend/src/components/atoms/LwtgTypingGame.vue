@@ -42,7 +42,7 @@
               v-for="(t, k) in tw[0]"
               :key="k"
               :class="{
-                'focused-word': j === nextIndex && k === 0,
+                'focused-word': j === nextIndex && k === 0 && isActivated,
                 'main-mono-color': isActivated,
                 'mono-30-color': !isActivated,
               }"
@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component';
 import UtilMixin from '@/mixins/utilMixin';
 import { TypeWord } from '@/models/types/typeWord';
@@ -69,20 +69,20 @@ import { TypeWord } from '@/models/types/typeWord';
 export default class LwtgTypingGame extends mixins(UtilMixin) {
   @Prop() typeWord!: TypeWord;
   @Prop() isActivated!: boolean;
-  typeWords = this.typeWord.typeWord;
+  typeWords = JSON.parse(JSON.stringify(this.typeWord.typeWord));
   clearedWords: string[] = [];
   typedWord = '';
   nextIndex = 0;
   mounted() {
-    if (this.isActivated) {
-      window.addEventListener('keydown', e => {
+    window.addEventListener('keydown', e => {
+      if (this.isActivated) {
         this.keyDown(e.key);
-      });
-    }
+      }
+    });
   }
   keyDown(code: string) {
     // typeすべき単語の最初の一文字をリストに格納する。
-    var target = this.typeWords[this.nextIndex].map(str => str[0]);
+    var target = this.typeWords[this.nextIndex].map((str: string) => str[0]);
     // キーコードを取得し、targetリストに含まれるか判定。
     // 間違っていたら終了。
     this.typedWord = code;
@@ -98,7 +98,7 @@ export default class LwtgTypingGame extends mixins(UtilMixin) {
       this.typeWords[this.nextIndex].splice(r, 1);
     }
     // 残ったそれぞれのタイプワードの一文字目を削除
-    this.typeWords[this.nextIndex] = this.typeWords[this.nextIndex].map(str => str.slice(1));
+    this.typeWords[this.nextIndex] = this.typeWords[this.nextIndex].map((str: string) => str.slice(1));
     // すでに空文字となったタイプワードがあれば次の文字に進む判定
     if (this.typeWords[this.nextIndex].includes('')) {
       this.nextIndex++;
@@ -122,11 +122,11 @@ export default class LwtgTypingGame extends mixins(UtilMixin) {
   complete() {
     this.$emit('shift');
   }
-  reset() {
-    this.typeWords = this.typeWord.typeWord;
-    console.log(this.typeWords);
+  @Watch('typeWord')
+  setTypeWords(newTypeWord: TypeWord) {
     this.clearedWords = [];
     this.nextIndex = 0;
+    this.typeWords = JSON.parse(JSON.stringify(newTypeWord.typeWord));
   }
 }
 </script>
