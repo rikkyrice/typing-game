@@ -31,26 +31,26 @@ type Registry struct {
 }
 
 // NewRegistry レジストリを生成
-func NewRegistry(conn *db.DBConn) *Registry {
+func NewRegistry(conn *db.DBConn) (*Registry, error) {
 	tR, err := infrastructure.NewTokenRepository(conn)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	uR, err := infrastructure.NewUserRepository(conn)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	wlR, err := infrastructure.NewWordListRepository(conn)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	wR, err := infrastructure.NewWordRepository(conn)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	sR, err := infrastructure.NewScoreRepository(conn)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	aUC := usecase.NewAuthUseCase(tR, uR)
@@ -81,5 +81,5 @@ func NewRegistry(conn *db.DBConn) *Registry {
 		WordListH:    wlH,
 		WordH:        wH,
 		ScoreH:       sH,
-	}
+	}, nil
 }
