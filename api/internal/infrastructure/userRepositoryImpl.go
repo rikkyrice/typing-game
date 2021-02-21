@@ -13,16 +13,16 @@ import (
 )
 
 const selectUserByIDQuery string = `
-	SELECT * FROM users WHERE user_id = ?
+	SELECT * FROM users WHERE user_id = $1
 `
 
 const insertUserQuery string = `
 	INSERT INTO users
-	VALUES(?,?,?,?)
+	VALUES($1,$2,$3,$4)
 `
 
 const deleteUserQuery string = `
-	DELETE FROM users WHERE user_id = ?
+	DELETE FROM users WHERE user_id = $1
 `
 
 // NewUserRepository ユーザーリポジトリの生成

@@ -14,19 +14,19 @@ import (
 const selectTokenByUserIDQuery string = `
 	SELECT *
 	FROM token
-	WHERE user_id = ?
+	WHERE user_id = $1
 	ORDER BY created_at desc
-	FETCH FIRST 1 ROWS ONLY
+	FETCH FIRST 1 ROW ONLY
 `
 
 const insertTokenQuery string = `
 	INSERT INTO token
-	VALUES(?,?,?,?)
+	VALUES($1,$2,$3,$4)
 `
 
 const deleteTokenByUserIDQuery string = `
 	DELETE FROM token
-	WHERE user_id = ?
+	WHERE user_id = $1
 `
 
 // NewTokenRepository ORMapper

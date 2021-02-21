@@ -13,29 +13,29 @@ import (
 )
 
 const selectWordListByIDQuery string = `
-	SELECT * FROM wordlists WHERE id = ?
+	SELECT * FROM wordlists WHERE id = $1
 `
 
 const selectWordListByUserIDQuery string = `
-	SELECT * FROM wordlists WHERE user_id = ?
+	SELECT * FROM wordlists WHERE user_id = $1
 `
 
 const insertWordListQuery string = `
 	INSERT INTO wordlists
-	VALUES(?,?,?,?,?,?)
+	VALUES($1,$2,$3,$4,$5,$6)
 `
 
 const updateWordListByIDQuery string = `
 	UPDATE wordlists
 	SET
-		word_list_title = ?,
-		explanation = ?,
-		updated_at = ?
-	WHERE id = ?
+		word_list_title = $1,
+		explanation = $2,
+		updated_at = $3
+	WHERE id = $4
 `
 
 const deleteWordListByIDQuery string = `
-	DELETE FROM wordlists WHERE id = ?
+	DELETE FROM wordlists WHERE id = $1
 `
 
 // NewWordListRepository 単語帳リポジトリの生成
