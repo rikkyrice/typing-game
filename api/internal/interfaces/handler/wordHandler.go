@@ -88,23 +88,29 @@ func (w *wordHandler) GETWords() echo.HandlerFunc {
 }
 
 type wordQueryRequest struct {
-	WordListID  string    `json:"wordlistID" validate:"required"`
-	Word        string    `json:"word" validate:"required"`
-	Meaning     string    `json:"meaning" validate:"required"`
-	Explanation string    `json:"explanation" validate:"required"`
-	CreatedAt   time.Time `json:"createdAt" validate:"required"`
-	UpdatedAt   time.Time `json:"updatedAt" validate:"required"`
+	WordListID   string    `json:"wordlistID" validate:"required"`
+	Word         string    `json:"word" validate:"required"`
+	Yomi         string    `json:"yomi" validate:"required"`
+	Meaning      string    `json:"meaning" validate:"required"`
+	MYomi        string    `json:"m_yomi" validate:"required"`
+	Explanation  string    `json:"explanation" validate:"required"`
+	IsRemembered bool      `json:"is_remembered" validate:"required"`
+	CreatedAt    time.Time `json:"createdAt" validate:"required"`
+	UpdatedAt    time.Time `json:"updatedAt" validate:"required"`
 }
 
 func (wR *wordQueryRequest) toWord() model.Word {
 	return model.Word{
-		ID:          "",
-		WordListID:  wR.WordListID,
-		Word:        wR.Word,
-		Meaning:     wR.Meaning,
-		Explanation: wR.Explanation,
-		CreatedAt:   wR.CreatedAt,
-		UpdatedAt:   wR.UpdatedAt,
+		ID:           "",
+		WordListID:   wR.WordListID,
+		Word:         wR.Word,
+		Yomi:         wR.Yomi,
+		Meaning:      wR.Meaning,
+		MYomi:        wR.MYomi,
+		Explanation:  wR.Explanation,
+		IsRemembered: wR.IsRemembered,
+		CreatedAt:    wR.CreatedAt,
+		UpdatedAt:    wR.UpdatedAt,
 	}
 }
 

@@ -89,7 +89,6 @@ type scoreQueryRequest struct {
 	PlayCount      int       `json:"playCount" validate:"required"`
 	ClearTypeCount int       `json:"clearTypeCount" validate:"required"`
 	MissTypeCount  int       `json:"missTypeCount" validate:"required"`
-	CorrectRate    float64   `json:"correctRate" validate:"required"`
 	PlayedAt       time.Time `json:"playedAt" validate:"required"`
 }
 
@@ -100,7 +99,6 @@ func (sR *scoreQueryRequest) toScore() model.Score {
 		PlayCount:      sR.PlayCount,
 		ClearTypeCount: sR.ClearTypeCount,
 		MissTypeCount:  sR.MissTypeCount,
-		CorrectRate:    sR.CorrectRate,
 		PlayedAt:       sR.PlayedAt,
 	}
 }

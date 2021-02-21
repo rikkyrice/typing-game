@@ -14,8 +14,6 @@ type Score struct {
 	ClearTypeCount int `json:"clearTypeCount" validate:"required"`
 	// MissTypeCount ミスタイプ数
 	MissTypeCount int `json:"missTypeCount" validate:"required"`
-	// CorrectRate
-	CorrectRate float64 `json:"correctRate" validate:"required"`
 	// PlayedAt プレイ日時
 	PlayedAt time.Time `json:"playedAt" validate:"required"`
 }
