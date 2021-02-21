@@ -9,9 +9,6 @@ github.com/go-playground/locales/currency
 github.com/go-playground/universal-translator
 # github.com/google/uuid v1.1.1
 github.com/google/uuid
-# github.com/ibmdb/go_ibm_db v0.3.0
-github.com/ibmdb/go_ibm_db
-github.com/ibmdb/go_ibm_db/api
 # github.com/labstack/echo v3.3.10+incompatible
 github.com/labstack/echo
 github.com/labstack/echo/middleware
@@ -22,6 +19,10 @@ github.com/labstack/gommon/bytes
 github.com/labstack/gommon/random
 # github.com/leodido/go-urn v1.2.0
 github.com/leodido/go-urn
+# github.com/lib/pq v1.9.1-0.20210212175949-072e83d238c2
+github.com/lib/pq
+github.com/lib/pq/oid
+github.com/lib/pq/scram
 # github.com/mattn/go-colorable v0.1.2
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.9
