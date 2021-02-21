@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"api/db"
 	"api/internal/config"
@@ -12,16 +12,19 @@ import (
 func main() {
 	c, err := config.Init("config/env.yaml")
 	if err != nil {
-		fmt.Printf("設定ファイルの読み込みに失敗しました。%+v", err)
+		log.Fatalf("設定ファイルの読み込みに失敗しました。%+v", err)
 	}
 
 	conn, err := db.NewDBConn(c.DB)
 	if err != nil {
-		fmt.Printf("DBとの接続に失敗しました。%+v", err)
+		log.Fatalf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
 
-	rg := registry.NewRegistry(conn)
+	rg, err := registry.NewRegistry(conn)
+	if err != nil {
+		log.Fatalf("registryの初期化に失敗しました。%+v", err)
+	}
 	r := router.NewRouter()
 
 	r.Init(rg)
