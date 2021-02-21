@@ -32,10 +32,13 @@ const typeWord: TypeWordState = {
   typeMeaning: {} as TypeWord,
 };
 
+const gameCleared: boolean = false;
+
 export const state: State = {
   userInfo,
   auth,
   scrollTarget,
   snackbar,
   typeWord,
+  gameCleared,
 };

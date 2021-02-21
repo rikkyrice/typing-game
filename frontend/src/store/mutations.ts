@@ -9,6 +9,9 @@ const mutations: MutationTree<State> = {
   shiftTypeMeaning(state: State, typeWord: TypeWord) {
     state.typeWord.typeMeaning = typeWord;
   },
+  switchCleared(state: State, cleared: boolean) {
+    state.gameCleared = cleared;
+  }
 };
 
 export default mutations;

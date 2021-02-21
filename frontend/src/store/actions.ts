@@ -10,6 +10,9 @@ const actions: ActionTree<State, State> = {
   [TYPES.SHIFT_TYPEMEANING]({ commit }, typeWord: TypeWord) {
     commit('shiftTypeMeaning', typeWord);
   },
+  [TYPES.SWITCH_CLEARED]({ commit }, cleared: boolean) {
+    commit('switchCleared', cleared);
+  },
 }
 
 export default actions;

@@ -6,6 +6,7 @@ export interface State {
   scrollTarget: string;
   snackbar: SnackbarInfo;
   typeWord: TypeWordState;
+  gameCleared: boolean;
 }
 
 export interface UserState {
