@@ -1,0 +1,13 @@
+version: "3"
+services:
+  backdb:
+    image: postgres
+    container_name: lwtg-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./config/db:/docker-entrypoint-initdb.d
