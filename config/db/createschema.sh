@@ -1,18 +1,18 @@
 #!/bin/bash
 
-/database/config/db2inst1/sqllib/bin/db2 connect to USERDB user db2inst1 using password
+BASE_DIR=/docker-entrypoint-initdb.d
+SQL_DIR=${BASE_DIR}/sql
+DATA_DIR=${BASE_DIR}/data
 
-# create tables
-/database/config/db2inst1/sqllib/bin/db2 -tvf /var/custom/sql/users_create.sql
-/database/config/db2inst1/sqllib/bin/db2 -tvf /var/custom/sql/wordlists_create.sql
-/database/config/db2inst1/sqllib/bin/db2 -tvf /var/custom/sql/words_create.sql
-/database/config/db2inst1/sqllib/bin/db2 -tvf /var/custom/sql/scores_create.sql
-/database/config/db2inst1/sqllib/bin/db2 -tvf /var/custom/sql/token_create.sql
+## create tables
+psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} < ${SQL_DIR}/01_users_create.sql
+psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} < ${SQL_DIR}/02_token_create.sql
+psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} < ${SQL_DIR}/03_wordlists_create.sql
+psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} < ${SQL_DIR}/04_words_create.sql
+psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} < ${SQL_DIR}/05_scores_create.sql
 
-# insert data
-/database/config/db2inst1/sqllib/bin/db2 import from /var/custom/data/users.csv of del insert into Users
-/database/config/db2inst1/sqllib/bin/db2 import from /var/custom/data/wordlists.csv of del insert into WordLists
-/database/config/db2inst1/sqllib/bin/db2 import from /var/custom/data/words.csv of del insert into Words
-/database/config/db2inst1/sqllib/bin/db2 import from /var/custom/data/scores.csv of del insert into Scores
-
-/database/config/db2inst1/sqllib/bin/db2 terminate
+## insert data
+psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "\copy users from ${DATA_DIR}/users.csv with csv"
+psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "\copy wordlists from ${DATA_DIR}/wordlists.csv with csv"
+psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "\copy words from ${DATA_DIR}/words.csv with csv"
+psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "\copy scores from ${DATA_DIR}/scores.csv with csv"
