@@ -64,6 +64,8 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component';
 import UtilMixin from '@/mixins/utilMixin';
 import { TypeWord } from '@/models/types/typeWord';
+import store from '@/store';
+import { TYPES } from '@/store/mutation-types';
 
 @Component
 export default class LwtgTypingGame extends mixins(UtilMixin) {
@@ -76,7 +78,7 @@ export default class LwtgTypingGame extends mixins(UtilMixin) {
   nextIndex = 0;
   mounted() {
     window.addEventListener('keydown', e => {
-      if (this.isActivated) {
+      if (this.isActivated && !store.state.gameCleared) {
         this.keyDown(e.key);
       }
     });

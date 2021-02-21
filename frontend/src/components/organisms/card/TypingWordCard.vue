@@ -31,7 +31,7 @@
               v-if="!clear"
               :key="key"
               :typeWord="typeWord"
-              :isActivated="isActivated"
+              :isActivated="getIsActivated"
               @shift="shift"
             />
             <span
@@ -51,7 +51,7 @@
               v-if="!clear"
               :key="key"
               :typeWord="typeWord"
-              :isActivated="isActivated"
+              :isActivated="getIsActivated"
               :wordOnly="wordOnly"
               @shift="shift"
             />
@@ -64,6 +64,11 @@
               }"
               :style="fontSizeUtil(24, 24, 32)"
             >{{ words[index].explanation }}</span>
+            <span
+              v-else
+              class="bold main-mono-color"
+              :style="fontSizeUtil(24, 24, 32)"
+            >- Press Space to Restart -</span>
           </div>
         </div>
       </template>
@@ -111,6 +116,9 @@ export default class TypingWordCard extends mixins(UtilMixin) {
   get typeWord() {
     return this.isWords ? store.state.typeWord.typeWord : store.state.typeWord.typeMeaning;
   }
+  get getIsActivated() {
+    return this.isActivated
+  }
   dipatchTypeWord() {
     if (this.isWords) {
       store.dispatch(TYPES.SHIFT_TYPEWORD, this.typeWords[this.index]);
@@ -127,6 +135,11 @@ export default class TypingWordCard extends mixins(UtilMixin) {
       this.handleResize();
     }
     this.dipatchTypeWord();
+    window.addEventListener('keydown', e => {
+      if (store.state.gameCleared) {
+        this.keyDown(e.key);
+      }
+    });
   }
   handleResize() {
     const typingWordCard = document.getElementById(
@@ -141,19 +154,26 @@ export default class TypingWordCard extends mixins(UtilMixin) {
       }
     }
   }
+  keyDown(code: string) {
+    if (code !== ' ') {
+      return false;
+    }
+    this.$emit('reset');
+  }
   shift() {
     this.$emit('shift');
   }
   shiftIndex() {
     this.index += 1;
     if (this.index === this.typeWords.length) {
-      // this.reset();
       this.clear = true;
+      store.dispatch(TYPES.SWITCH_CLEARED, true);
     } else {
       this.dipatchTypeWord();
     }
   }
   reset() {
+    store.dispatch(TYPES.SWITCH_CLEARED, false);
     this.clear = false;
     this.index = 0;
     this.dipatchTypeWord();

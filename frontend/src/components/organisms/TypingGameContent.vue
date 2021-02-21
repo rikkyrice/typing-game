@@ -36,6 +36,7 @@
             :words="wordArray.words"
             :isActivated="shiftController"
             @shift="shift"
+            @reset="reset"
           />
         </v-col>
         <v-col cols="1">
@@ -60,6 +61,7 @@
             :isActivated="!shiftController"
             :wordOnly="wordOnly"
             @shift="shift"
+            @reset="reset"
           />
         </v-col>
         <v-spacer />
@@ -87,7 +89,10 @@ export default class TypingGameContent extends mixins(UtilMixin) {
   @Prop() wordList!: WordList;
   @Prop() wordArray!: WordArray;
   shiftController = true;
-  wordOnly = true;
+  wordOnly = false;
+  created() {
+    store.dispatch(TYPES.SWITCH_CLEARED, false);
+  }
   refs():any {
     return this.$refs;
   }
