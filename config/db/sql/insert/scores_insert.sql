@@ -1,2 +1,0 @@
-INSERT INTO Scores VALUE(0, 1, 0, 0, 0, 0, "2020-10-03 22:50:00");
-INSERT INTO Scores VALUE(1, 2, 0, 0, 0, 0, "2020-10-04 22:51:00");
