@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/ibmdb/go_ibm_db"
+	_ "github.com/lib/pq"
 )
 
 // DBConn definition of connection
@@ -20,12 +20,13 @@ type DBConnConfig struct {
 	Port     string `yaml:"port"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
+	SSLMode  string `yaml:"sslmode"`
 }
 
 // NewDBConn create DB connection
 func NewDBConn(c *DBConnConfig) (*DBConn, error) {
-	conn := "HOSTNAME=" + c.Hostname + ";DATABASE=" + c.Database + ";PORT=" + c.Port + ";UID=" + c.Username + ";PWD=" + c.Password
-	db, err := sql.Open("go_ibm_db", conn)
+	conn := "host=" + c.Hostname + " dbname=" + c.Database + " port=" + c.Port + " user=" + c.Username + " password=" + c.Password + " sslmode=" + c.SSLMode
+	db, err := sql.Open("postgres", conn)
 	if err != nil {
 		fmt.Println("failed to open.")
 		return nil, err
