@@ -40,13 +40,23 @@ Vue.use(Toasted, {
   components: { LwtgSnackbar, HeaderNavbar, SideNavbar },
 })
 export default class App extends Vue {
-  navItemList: NavItemInfo[] = [
+  userId = store.state.auth.userId;
+  navItemListBeforeLogin: NavItemInfo[] = [
     { type: 'img', label: require('@/assets/lwtg-logo-3.svg'), path: '/' },
-    { type: 'span', label: 'マイページ', path: '/mypage' },
     { type: 'span', label: 'ユーザー登録', path: '/signup' },
     { type: 'span', label: 'ログイン', path: '/login' },
+  ];
+  navItemListAfterLogin: NavItemInfo[] = [
+    { type: 'img', label: require('@/assets/lwtg-logo-3.svg'), path: '/' },
+    { type: 'span', label: 'マイページ', path: '/mypage' },
     { type: 'span', label: 'PlayGround', path: '/pg' },
   ];
+
+  get navItemList() {
+    return this.userId
+      ? this.navItemListAfterLogin
+      : this.navItemListBeforeLogin;
+  }
 
   get snackbarInfo() {
     return store.state.snackbar;
