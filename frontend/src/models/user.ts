@@ -4,3 +4,8 @@ export interface User {
   password: string;
   createdAt: string;
 }
+
+export interface TokenInfo {
+  token: string
+  userId: string
+}
