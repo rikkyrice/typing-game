@@ -1,8 +1,11 @@
 import { MutationTree } from 'vuex';
-import { State } from '@/store/types';
+import { State, RouteInfo } from '@/store/types';
 import { TypeWord } from '@/models/types/typeWord';
 
 const mutations: MutationTree<State> = {
+  setLastPageRoute(state: State, lastPageRoute: RouteInfo) {
+    state.auth.lastPageRoute = lastPageRoute;
+  },
   shiftTypeWord(state: State, typeWord: TypeWord) {
     state.typeWord.typeWord = typeWord;
   },
