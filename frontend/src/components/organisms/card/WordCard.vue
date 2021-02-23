@@ -2,7 +2,10 @@
   <v-hover v-model="isCardHover">
     <div
       :id="`word-card-${index}`"
-      class="flip-card">
+      class="flip-card"
+      @click="handleClick()"
+      @click.stop="handleClickStopOption()"
+    >
       <lwtg-word-card
         :width="width"
         :border="border"
@@ -112,7 +115,6 @@
                     @click="wordVisibility"
                   />
                   <lwtg-icon-button
-                    v-if="isCardHover"
                     size="large"
                     :src="checkIconButton"
                     @click="patchRemember"
@@ -174,6 +176,7 @@ export default class WordListCard extends mixins(UtilMixin) {
   get checkIconButton() {
     const i =
       Number(this.word.isRemembered);
+    console.log(i);
     return this.checkIconSrcList[i];
   }
   get wordFont() {
@@ -235,6 +238,13 @@ export default class WordListCard extends mixins(UtilMixin) {
     } else {
       this.isWordRevealed = true;
     }
+  }
+  handleClick(ev: any) {
+    this.$emit('click', ev);
+  }
+
+  handleClickStopOption(ev: any) {
+    this.$emit('clickStop', ev);
   }
 }
 </script>
