@@ -13,10 +13,10 @@ import (
 const (
 	basepath        = "/api"
 	healthcheckpath = basepath + "/healthcheck"
-	userpath        = basepath + "/user"
-	wordlistpath    = basepath + "/wordlist"
-	wordpath        = basepath + "/word"
-	scorepath       = basepath + "/score"
+	userpath        = basepath + "/users"
+	wordlistpath    = basepath + "/wordlists"
+	wordpath        = basepath + "/words"
+	scorepath       = basepath + "/scores"
 )
 
 // Router route

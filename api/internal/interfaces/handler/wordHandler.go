@@ -32,12 +32,35 @@ type wordHandler struct {
 }
 
 type wordResponse struct {
-	Word *model.Word `json:"word"`
+	ID           string    `json:"id"`
+	Word         string    `json:"word"`
+	Yomi         string    `json:"yomi"`
+	Meaning      string    `json:"meaning"`
+	MYomi        string    `json:"m_yomi"`
+	Explanation  string    `json:"explanation"`
+	IsRemembered bool      `json:"is_remembered"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+func toWordResponse(word *model.Word) *wordResponse {
+	return &wordResponse{
+		ID:           word.ID,
+		Word:         word.Word,
+		Yomi:         word.Yomi,
+		Meaning:      word.Meaning,
+		MYomi:        word.MYomi,
+		Explanation:  word.Explanation,
+		IsRemembered: word.IsRemembered,
+		CreatedAt:    word.CreatedAt,
+		UpdatedAt:    word.UpdatedAt,
+	}
 }
 
 func (w *wordHandler) GETWord() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
@@ -51,21 +74,20 @@ func (w *wordHandler) GETWord() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
-		res := &wordResponse{
-			Word: word,
-		}
+		res := toWordResponse(word)
 		return c.JSON(http.StatusOK, res)
 	}
 }
 
 type wordsResponse struct {
-	Matched int           `json:"matched"`
-	Words   []*model.Word `json:"words"`
+	Matched int             `json:"matched"`
+	Words   []*wordResponse `json:"words"`
 }
 
 func (w *wordHandler) GETWords() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
@@ -79,24 +101,25 @@ func (w *wordHandler) GETWords() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
+		ws := []*wordResponse{}
+		for _, word := range words {
+			ws = append(ws, toWordResponse(word))
+		}
 		res := &wordsResponse{
 			Matched: len(words),
-			Words:   words,
+			Words:   ws,
 		}
 		return c.JSON(http.StatusOK, res)
 	}
 }
 
 type wordQueryRequest struct {
-	WordListID   string    `json:"wordlistID" validate:"required"`
-	Word         string    `json:"word" validate:"required"`
-	Yomi         string    `json:"yomi" validate:"required"`
-	Meaning      string    `json:"meaning" validate:"required"`
-	MYomi        string    `json:"m_yomi" validate:"required"`
-	Explanation  string    `json:"explanation" validate:"required"`
-	IsRemembered bool      `json:"is_remembered" validate:"required"`
-	CreatedAt    time.Time `json:"createdAt" validate:"required"`
-	UpdatedAt    time.Time `json:"updatedAt" validate:"required"`
+	WordListID   string `json:"word_list_id" validate:"required"`
+	Word         string `json:"word" validate:"required"`
+	Meaning      string `json:"meaning" validate:"required"`
+	Explanation  string `json:"explanation" validate:"required"`
+	IsRemembered bool   `json:"is_remembered" validate:"required"`
+	CreatedAt    time.Time
 }
 
 func (wR *wordQueryRequest) toWord() model.Word {
@@ -104,19 +127,20 @@ func (wR *wordQueryRequest) toWord() model.Word {
 		ID:           "",
 		WordListID:   wR.WordListID,
 		Word:         wR.Word,
-		Yomi:         wR.Yomi,
+		Yomi:         "",
 		Meaning:      wR.Meaning,
-		MYomi:        wR.MYomi,
+		MYomi:        "",
 		Explanation:  wR.Explanation,
 		IsRemembered: wR.IsRemembered,
 		CreatedAt:    wR.CreatedAt,
-		UpdatedAt:    wR.UpdatedAt,
+		UpdatedAt:    time.Now(),
 	}
 }
 
 func (w *wordHandler) POSTWord() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
@@ -124,15 +148,14 @@ func (w *wordHandler) POSTWord() echo.HandlerFunc {
 		if err := getQueryParams(c, &queryParams); err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
+		queryParams.CreatedAt = time.Now()
 
 		word, err := w.WordUseCase.PostWord(queryParams.toWord())
 		if err != nil {
 			c.Echo().Logger.Errorf("単語の作成に失敗しました。%+v", err)
 			return c.JSON(err.StatusCode, err)
 		}
-		res := &wordResponse{
-			Word: word,
-		}
+		res := toWordResponse(word)
 		return c.JSON(http.StatusCreated, res)
 	}
 }
@@ -147,7 +170,8 @@ type wordsPostResponse struct {
 
 func (w *wordHandler) POSTWords() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
@@ -174,7 +198,8 @@ func (w *wordHandler) POSTWords() echo.HandlerFunc {
 
 func (w *wordHandler) PUTWord() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
@@ -193,16 +218,15 @@ func (w *wordHandler) PUTWord() echo.HandlerFunc {
 			c.Echo().Logger.Errorf("単語帳の更新に失敗しました。%+v", err)
 			return c.JSON(err.StatusCode, err)
 		}
-		res := &wordResponse{
-			Word: word,
-		}
+		res := toWordResponse(word)
 		return c.JSON(http.StatusCreated, res)
 	}
 }
 
 func (w *wordHandler) DELETEWord() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
@@ -223,7 +247,8 @@ func (w *wordHandler) DELETEWord() echo.HandlerFunc {
 
 func (w *wordHandler) DELETEWords() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")

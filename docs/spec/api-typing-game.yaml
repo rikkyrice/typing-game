@@ -46,7 +46,6 @@ paths:
                 - user_id
                 - mail
                 - password
-                - created_at
               properties:
                 user_id:
                   type: string
@@ -60,17 +59,13 @@ paths:
                   type: string
                   description: パスワード
                   example: "rikkyrice"
-                created_at:
-                  type: date
-                  description: 作成日
-                  example: "2020-10-04 23:18:00"
       responses:
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostUsers'
+                $ref: '#/components/schemas/LoginUsers'
         '400':
           description: 入力値フォーマット不正
           content:
@@ -164,6 +159,13 @@ paths:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
         - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
+        - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
           required: true
@@ -184,16 +186,9 @@ paths:
             schema:
               type: object
               required:
-                - user_id
                 - word_list_title
                 - explanation
-                - created_at
-                - updated_at
               properties:
-                user_id:
-                  type: string
-                  description: ユーザーID
-                  example: "rikky"
                 word_list_title:
                   type: string
                   description: 単語帳名
@@ -202,14 +197,6 @@ paths:
                   type: string
                   description: 説明
                   example:
-                created_at:
-                  type: timestamp
-                  description: 作成日時
-                  example: "2020-10-04 23:18:00"
-                updated_at:
-                  type: timestamp
-                  description: 更新日時
-                  example: "2020-10-04 23:19:00"
       responses:
         '200':
           description: Created
@@ -233,7 +220,6 @@ paths:
                 $ref: '#/components/schemas/APIError'
               example:
                 $ref: '#/components/errors/InternalServerError'
-  /wordlists/{user_id}:
     get:
       tags:
         - WordLists
@@ -248,6 +234,13 @@ paths:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
         - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
+        - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
           required: true
@@ -261,13 +254,6 @@ paths:
           schema:
             type: string
             example: "application/json"
-        - in: path
-          name: user_id
-          description: ユーザーID
-          required: true
-          schema:
-            type: string
-            example: "rikky"
         - in: query
           name: sort
           description: ソートキー。未指定時は作成日時が降順でソートされる。
@@ -326,6 +312,13 @@ paths:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
         - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
+        - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
           required: true
@@ -355,7 +348,6 @@ paths:
               required:
                 - word_list_title
                 - explanation
-                - updated_at
               properties:
                 word_list_title:
                   type: string
@@ -365,17 +357,13 @@ paths:
                   type: string
                   description: 説明
                   example:
-                updated_at:
-                  type: timestamp
-                  description: 更新日時
-                  example: "2020-10-04 23:19:00"
       responses:
         '200':
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PutWordList'
+                $ref: '#/components/schemas/WordList'
         '400':
           description: 入力値フォーマット不正
           content:
@@ -405,6 +393,13 @@ paths:
           schema:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
         - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
@@ -453,6 +448,13 @@ paths:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
         - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
+        - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
           required: true
@@ -473,13 +475,32 @@ paths:
             schema:
               type: object
               required:
-                - words
+                - word_id
+                - word
+                - meaning
+                - explanation
+                - is_remembered
               properties:
-                words:
-                  type: array
+                word_id:
+                  type: integer
+                  description: 単語ID
+                  example: 0
+                word:
+                  type: string
                   description: 単語
-                  items:
-                    $ref: '#/components/schemas/Word'
+                  example: "organization"
+                meaning:
+                  type: string
+                  description: 意味
+                  example:
+                explanation:
+                  type: string
+                  description: 説明
+                  example:
+                is_remembered:
+                  type: boolean
+                  description: 覚えたかどうかのフラグ
+                  example: true
       responses:
         '200':
           description: Created
@@ -517,6 +538,13 @@ paths:
           schema:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
         - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
@@ -608,6 +636,13 @@ paths:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
         - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
+        - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
           required: true
@@ -665,6 +700,13 @@ paths:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
         - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
+        - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
           required: true
@@ -695,7 +737,6 @@ paths:
                 - word
                 - meaning
                 - explanation
-                - updated_at
               properties:
                 word:
                   type: string
@@ -709,10 +750,6 @@ paths:
                   type: string
                   description: 説明
                   example:
-                updated_at:
-                  type: timestamp
-                  description: 更新日時
-                  example: "2020-10-04 23:19:00"
       responses:
         '200':
           description: Created
@@ -749,6 +786,13 @@ paths:
           schema:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
         - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
@@ -796,6 +840,13 @@ paths:
           schema:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
         - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
@@ -848,6 +899,13 @@ paths:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
         - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
+        - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
           required: true
@@ -866,7 +924,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Score'
+              type: object
+              required:
+                - score_id
+                - play_count
+                - clear_type_count
+                - miss_type_count
+              properties:
+                score_id:
+                  type: integer
+                  description: スコアID
+                  example: 0
+                play_count:
+                  type: integer
+                  description: プレイ回数
+                  example: 100
+                clear_type_count:
+                  type: integer
+                  description: クリアタイプ数
+                  example: 200
+                miss_type_count:
+                  type: integer
+                  description: ミスタイプ数
+                  example: 10
       responses:
         '201':
           description: Created
@@ -904,6 +984,13 @@ paths:
           schema:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
         - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
@@ -962,6 +1049,13 @@ paths:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
         - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
+        - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
           required: true
@@ -1009,6 +1103,13 @@ paths:
             type: string
             example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
         - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
+        - in: header
           name: Accept
           description: レスポンスのコンテンツタイプ
           required: true
@@ -1054,30 +1155,6 @@ paths:
                 $ref: '#/components/errors/InternalServerError'
 components:
   schemas:
-    PostUsers:
-      type: object
-      required:
-        - user_id
-        - mail
-        - password
-        - created_at
-      properties:
-        user_id:
-          type: string
-          description: ユーザーID
-          example: "rikky"
-        mail:
-          type: string
-          description: メールアドレス
-          example: "rikkyrice@gmail.com"
-        password:
-          type: string
-          description: パスワード
-          example: "rikkyrice"
-        created_at:
-          type: date
-          description: 作成日
-          example: "2020-10-04 23:18:00"
     LoginUsers:
       type: object
       required:
@@ -1096,7 +1173,6 @@ components:
       type: object
       required:
         - word_list_id
-        - user_id
         - word_list_title
         - explanation
         - created_at
@@ -1106,10 +1182,6 @@ components:
           type: integer
           description: 単語帳ID
           example: 0
-        user_id:
-          type: string
-          description: ユーザーID
-          example: "rikky"
         word_list_title:
           type: string
           description: 単語帳名
@@ -1145,7 +1217,6 @@ components:
       type: object
       required:
         - word_list_id
-        - user_id
         - word_list_title
         - explanation
         - created_at
@@ -1155,10 +1226,6 @@ components:
           type: integer
           description: 単語帳ID
           example: 0
-        user_id:
-          type: string
-          description: ユーザーID
-          example: "rikky"
         word_list_title:
           type: string
           description: 単語帳名
@@ -1175,30 +1242,37 @@ components:
           type: timestamp
           description: 更新日時
           example: "2020-10-04 23:19:00"
-    PutWordList:
+    PostWords:
       type: object
       required:
-        - word_list_title
+        - word_list_id
+        - word
+        - meaning
         - explanation
+        - is_remembered
+        - created_at
+        - updated_at
       properties:
-        word_list_title:
+        word_list_id:
+          type: integer
+          description: 単語帳ID
+          example: 0
+        word:
           type: string
-          description: 単語帳名
-          example: "TOEIC"
+          description: 単語
+          example: "organization"
+        meaning:
+          type: string
+          description: 意味
+          example:
         explanation:
           type: string
           description: 説明
           example:
-    PostWords:
-      type: object
-      required:
-        - words
-      properties:
-        words:
-          type: array
-          description: 単語
-          items:
-            $ref: '#/components/schemas/Word'
+        is_remembered:
+          type: boolean
+          description: 覚えたかどうかのフラグ
+          example: true
     GetWords:
       type: object
       required:
@@ -1217,28 +1291,11 @@ components:
     GetWord:
       $ref: '#/components/schemas/Word'
     PutWord:
-      type: object
-      required:
-        - word_list_title
-        - explanation
-      properties:
-        word:
-          type: string
-          description: 単語名
-          example: "organization"
-        meaning:
-          type: string
-          description: 意味
-          example:
-        explanation:
-          type: string
-          description: 説明
-          example:
+      $ref: '#/components/schemas/Word'
     Word:
       type: object
       required:
         - word_id
-        - word_list_id
         - word
         - meaning
         - explanation
@@ -1249,10 +1306,6 @@ components:
         word_id:
           type: integer
           description: 単語ID
-          example: 0
-        word_list_id:
-          type: integer
-          description: 単語帳ID
           example: 0
         word:
           type: string
@@ -1301,20 +1354,14 @@ components:
       type: object
       required:
         - score_id
-        - word_list_id
         - play_count
         - clear_type_count
         - miss_type_count
-        - correct_rate
         - played_at
       properties:
         score_id:
           type: integer
           description: スコアID
-          example: 0
-        word_list_id:
-          type: integer
-          description: 単語帳ID
           example: 0
         play_count:
           type: integer
@@ -1328,10 +1375,6 @@ components:
           type: integer
           description: ミスタイプ数
           example: 10
-        correct_rate:
-          type: double
-          description: 正誤率
-          example: 80%
         played_at:
           type: timestamp
           description: プレイ日時

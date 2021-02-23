@@ -141,20 +141,20 @@ func parse(signedString string) (*Auth, error) {
 }
 
 // Authenticate 認証を実施
-func Authenticate(c echo.Context) *apierror.Error {
+func Authenticate(c echo.Context) (string, *apierror.Error) {
 	tokenString := c.Request().Header.Get("Authorization")
 	if tokenString == "" {
-		return apierror.NewError(http.StatusUnauthorized, errors.New("Authorizationヘッダーに値がありません。"))
+		return "", apierror.NewError(http.StatusUnauthorized, errors.New("Authorizationヘッダーに値がありません。"))
 	}
 	userID := c.Request().Header.Get("X-User-ID")
 	if userID == "" {
-		return apierror.NewError(http.StatusUnauthorized, errors.New("X-User-IDヘッダーに値がありません。"))
+		return "", apierror.NewError(http.StatusUnauthorized, errors.New("X-User-IDヘッダーに値がありません。"))
 	}
 
 	if err := validateToken(strings.Replace(tokenString, "Bearer ", "", 1), userID); err != nil {
-		return apierror.NewError(http.StatusUnauthorized, err)
+		return "", apierror.NewError(http.StatusUnauthorized, err)
 	}
-	return nil
+	return userID, nil
 }
 
 func validateToken(tokenString string, userID string) error {

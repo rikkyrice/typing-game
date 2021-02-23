@@ -29,13 +29,14 @@ type scoreHandler struct {
 }
 
 type scoresResponse struct {
-	Matched int            `json:"matched"`
-	Scores  []*model.Score `json:"scores"`
+	Matched int              `json:"matched"`
+	Scores  []*scoreResponse `json:"scores"`
 }
 
 func (s *scoreHandler) GETScores() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
@@ -44,26 +45,44 @@ func (s *scoreHandler) GETScores() echo.HandlerFunc {
 			c.Echo().Logger.Errorf("パスパラメータの読み込みに失敗しました。%+v", err)
 			return c.JSON(err.StatusCode, err)
 		}
-
 		scores, err := s.ScoreUseCase.GetScores(pathParams.ID)
 		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
+		ss := []*scoreResponse{}
+		for _, score := range scores {
+			ss = append(ss, toScoreResponse(score))
+		}
 		res := &scoresResponse{
 			Matched: len(scores),
-			Scores:  scores,
+			Scores:  ss,
 		}
 		return c.JSON(http.StatusOK, res)
 	}
 }
 
 type scoreResponse struct {
-	Score *model.Score `json:"score"`
+	ID             string    `json:"id"`
+	PlayCount      int       `json:"play_count"`
+	ClearTypeCount int       `json:"clear_type_count"`
+	MissTypeCount  int       `json:"miss_type_count"`
+	PlayedAt       time.Time `json:"played_at"`
+}
+
+func toScoreResponse(score *model.Score) *scoreResponse {
+	return &scoreResponse{
+		ID:             score.ID,
+		PlayCount:      score.PlayCount,
+		ClearTypeCount: score.ClearTypeCount,
+		MissTypeCount:  score.MissTypeCount,
+		PlayedAt:       score.PlayedAt,
+	}
 }
 
 func (s *scoreHandler) GETLatestScore() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
@@ -77,9 +96,7 @@ func (s *scoreHandler) GETLatestScore() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
-		res := &scoreResponse{
-			Score: score,
-		}
+		res := toScoreResponse(score)
 		return c.JSON(http.StatusOK, res)
 	}
 }
@@ -105,7 +122,8 @@ func (sR *scoreQueryRequest) toScore() model.Score {
 
 func (s *scoreHandler) POSTScore() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
@@ -119,16 +137,15 @@ func (s *scoreHandler) POSTScore() echo.HandlerFunc {
 			c.Echo().Logger.Errorf("スコアの作成に失敗しました。%+v", err)
 			return c.JSON(err.StatusCode, err)
 		}
-		res := &scoreResponse{
-			Score: score,
-		}
+		res := toScoreResponse(score)
 		return c.JSON(http.StatusCreated, res)
 	}
 }
 
 func (s *scoreHandler) DELETEScores() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := usecase.Authenticate(c); err != nil {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
 		c.Echo().Logger.Info("認証OK")
