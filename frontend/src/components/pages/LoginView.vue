@@ -20,7 +20,6 @@ import FormTemplate from '@/components/templates/FormTemplate.vue';
   }
 })
 export default class LoginView extends mixins(UtilMixin) {
-
 }
 </script>
 
