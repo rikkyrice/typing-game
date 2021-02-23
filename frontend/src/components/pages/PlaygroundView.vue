@@ -52,19 +52,16 @@
         />
       </v-hover>
     </lwtg-content>
-    <div class="lwtg-white-bg">
-      <ca-content
-        :caItems="caItems"
-      />
-    </div>
-    <lwtg-content>
-      <word-list-card />
-    </lwtg-content>
     <filter-expansion-panel />
     <div class="pa-0" style="width: 100%;">
       <word-content
         :wordList="wordList"
         :wordArray="getWords"
+      />
+    </div>
+    <div class="lwtg-white-bg">
+      <ca-content
+        :caItems="caItems"
       />
     </div>
     <lwtg-loader :page-loading="true" :loading="viewLoading" />
@@ -133,8 +130,8 @@ export default class PlaygroundView extends mixins(UtilMixin) {
     { title: 'CSR', subtitle: '社会的責任', path: '/', img: '#' },
   ];
   wordList: WordList = {
-      wordListId: '1',
-      wordListTitle: 'TOEIC',
+      id: '1',
+      title: 'TOEIC',
       explanation: 'TOEICの頻出単語を単語帳にしました！ぜひ使って990点めざしましょう!',
       createdAt: '2021-02-06-00:00:00',
       updatedAt: '2021-02-06-00:00:00',
@@ -162,6 +159,7 @@ export default class PlaygroundView extends mixins(UtilMixin) {
     );
   }
   get getWords() {
+    // console.log('pg.isRemembered:' + this.wordArray.words[0].isRemembered)
     return this.wordArray;
   }
   created() {
@@ -169,7 +167,7 @@ export default class PlaygroundView extends mixins(UtilMixin) {
   }
   fetchWordArray() {
     this.wordArrayLoading = true;
-    WordApi.getWords('5f52039d-d983-4ebd-90b2-e3e04f821896')
+    WordApi.getWords('6b47623b-5f29-4365-974b-25864ca6ce24')
       .then((data) => {
         this.wordArray = data;
     })

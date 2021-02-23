@@ -136,7 +136,7 @@ export default class WordListCard extends mixins(UtilMixin) {
       : require('@/assets/common/trash-can-outline.svg');
   }
   pageTransition() {
-    this.$router.push(`/mypage/${this.wordlist.wordListId}`, () => {});
+    this.$router.push(`/mypage/${this.wordlist.id}`, () => {});
   }
 }
 </script>

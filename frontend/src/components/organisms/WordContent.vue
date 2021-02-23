@@ -13,7 +13,7 @@
           <v-spacer />
           <v-col cols="4" style="text-align: center;">
             <span class="bold" :style="fontSizeUtil(24, 24, 20)"
-            >{{ wordList.wordListTitle }}</span>
+            >{{ wordList.title }}</span>
           </v-col>
           <v-col cols="4">
             <lwtg-icon-button
@@ -74,7 +74,7 @@
         <v-col cols="10" class="d-flex flex-wrap">
           <div
             v-for="(word, i) in wordArray.words"
-            :key="word.wordId"
+            :key="word.id"
             class="ma-1"
           >
             <word-card

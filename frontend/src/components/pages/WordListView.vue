@@ -44,8 +44,8 @@ import { WordArray } from '@/models/word';
 })
 export default class WordListView extends mixins(UtilMixin) {
   wordList: WordList = {
-      wordListId: '1',
-      wordListTitle: 'TOEIC',
+      id: '1',
+      title: 'TOEIC',
       explanation: 'TOEICの頻出単語を単語帳にしました！ぜひ使って990点めざしましょう!',
       createdAt: '2021-02-06-00:00:00',
       updatedAt: '2021-02-06-00:00:00',
@@ -54,7 +54,7 @@ export default class WordListView extends mixins(UtilMixin) {
     matched: 4,
     words: [
       {
-        wordId: '8e97230e-2c9d-44ed-9a95-e39aa6217dd7',
+        id: '8e97230e-2c9d-44ed-9a95-e39aa6217dd7',
         word: 'organization',
         yomi: '',
         meaning: '組織、企業',
@@ -65,7 +65,7 @@ export default class WordListView extends mixins(UtilMixin) {
         updatedAt: '2020-10-03-21.50.00.000000',
       },
       {
-        wordId: '90443017-7096-4e67-9ada-863f581bd1a7',
+        id: '90443017-7096-4e67-9ada-863f581bd1a7',
         word: 'communication',
         yomi: '',
         meaning: 'コミュニケーション',
@@ -76,7 +76,7 @@ export default class WordListView extends mixins(UtilMixin) {
         updatedAt: '2020-10-03-21.51.00.000000',
       },
       {
-        wordId: 'b5f888bd-d8c6-4d74-a61c-ef838d8b52d9',
+        id: 'b5f888bd-d8c6-4d74-a61c-ef838d8b52d9',
         word: 'government',
         yomi: '',
         meaning: '陰謀ありあり',
@@ -87,7 +87,7 @@ export default class WordListView extends mixins(UtilMixin) {
         updatedAt: '2020-10-03-21.52.00.000000',
       },
       {
-        wordId: '48d4becc-f73c-45f7-8cb5-a9dee4c4f214',
+        id: '48d4becc-f73c-45f7-8cb5-a9dee4c4f214',
         word: 'authentication',
         yomi: '',
         meaning: 'ここには何でも',
@@ -102,7 +102,7 @@ export default class WordListView extends mixins(UtilMixin) {
   breadcrumbs: BreadcrumbInfo[] = [
     { label: 'トップ', path: '/' },
     { label: 'My Page', path: '/mypage' },
-    { label: `${this.wordList.wordListTitle}`, path: `/mypage/${this.wordList.wordListId}` },
+    { label: `${this.wordList.title}`, path: `/mypage/${this.wordList.id}` },
   ];
 }
 </script>
