@@ -17,6 +17,7 @@ export interface UserState {
 
 export interface AuthState {
   token: string;
+  userId: string,
   lastPageRoute: RouteInfo;
 }
 

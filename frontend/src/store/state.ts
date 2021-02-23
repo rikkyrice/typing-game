@@ -17,6 +17,7 @@ const userInfo: UserState = {
 
 const auth: AuthState = {
   token: '',
+  userId: '',
   lastPageRoute: {} as RouteInfo,
 }
 
