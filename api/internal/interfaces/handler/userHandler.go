@@ -32,7 +32,7 @@ type userHandler struct {
 }
 
 type signupQueryRequest struct {
-	UserID    string `json:"user_id" validate:"required"`
+	UserID    string `json:"userId" validate:"required"`
 	Mail      string `json:"mail" validate:"required,email"`
 	Password  string `json:"password" validate:"required"`
 	CreatedAt time.Time
@@ -49,7 +49,7 @@ func (sR *signupQueryRequest) toUser() model.User {
 
 type tokenResponse struct {
 	Token  string `json:"token"`
-	UserID string `json:"user_id"`
+	UserID string `json:"userId"`
 }
 
 // SignUp /signup
@@ -75,7 +75,7 @@ func (u *userHandler) Signup() echo.HandlerFunc {
 }
 
 type loginQueryRequest struct {
-	UserID   string `json:"user_id" validate:"required"`
+	UserID   string `json:"userId" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
 

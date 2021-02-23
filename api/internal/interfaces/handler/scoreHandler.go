@@ -63,10 +63,10 @@ func (s *scoreHandler) GETScores() echo.HandlerFunc {
 
 type scoreResponse struct {
 	ID             string    `json:"id"`
-	PlayCount      int       `json:"play_count"`
-	ClearTypeCount int       `json:"clear_type_count"`
-	MissTypeCount  int       `json:"miss_type_count"`
-	PlayedAt       time.Time `json:"played_at"`
+	PlayCount      int       `json:"playCount"`
+	ClearTypeCount int       `json:"clearTypeCount"`
+	MissTypeCount  int       `json:"missTypeCount"`
+	PlayedAt       time.Time `json:"playedAt"`
 }
 
 func toScoreResponse(score *model.Score) *scoreResponse {

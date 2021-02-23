@@ -30,10 +30,10 @@ type wordlistHandler struct {
 
 type wordlistResponse struct {
 	ID          string    `json:"id"`
-	Title       string    `json:"word_list_title"`
+	Title       string    `json:"title"`
 	Explanation string    `json:"explanation"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 func toWordlistResponse(wordlist *model.WordList) *wordlistResponse {
@@ -76,7 +76,7 @@ func (wl *wordlistHandler) GETWordList() echo.HandlerFunc {
 }
 
 type wordlistQueryRequest struct {
-	Title       string `json:"word_list_title" validate:"required"`
+	Title       string `json:"title" validate:"required"`
 	Explanation string `json:"explanation" validate:"required"`
 	CreatedAt   time.Time
 }

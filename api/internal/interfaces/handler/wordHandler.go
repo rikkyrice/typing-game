@@ -36,11 +36,11 @@ type wordResponse struct {
 	Word         string    `json:"word"`
 	Yomi         string    `json:"yomi"`
 	Meaning      string    `json:"meaning"`
-	MYomi        string    `json:"m_yomi"`
+	MYomi        string    `json:"mYomi"`
 	Explanation  string    `json:"explanation"`
-	IsRemembered bool      `json:"is_remembered"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	IsRemembered bool      `json:"isRemembered"`
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
 }
 
 func toWordResponse(word *model.Word) *wordResponse {
@@ -114,11 +114,11 @@ func (w *wordHandler) GETWords() echo.HandlerFunc {
 }
 
 type wordQueryRequest struct {
-	WordListID   string `json:"word_list_id" validate:"required"`
+	WordListID   string `json:"wordListId" validate:"required"`
 	Word         string `json:"word" validate:"required"`
 	Meaning      string `json:"meaning" validate:"required"`
 	Explanation  string `json:"explanation" validate:"required"`
-	IsRemembered bool   `json:"is_remembered" validate:"required"`
+	IsRemembered bool   `json:"isRemembered" validate:"required"`
 	CreatedAt    time.Time
 }
 
