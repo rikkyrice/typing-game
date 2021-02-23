@@ -4,6 +4,7 @@ import { AxiosRequestConfig, AxiosError } from 'axios';
 import router from '@/router';
 import store from '@/store';
 import { TYPES } from '@/store/mutation-types';
+import { PAGES } from '@/router/pages';
 
 // set Token to request.headers.Authorization
 const reqHandler = (request: AxiosRequestConfig) => {
@@ -14,14 +15,15 @@ const reqHandler = (request: AxiosRequestConfig) => {
   ) {
     request.headers.noauth = true;
   }
-  // const token = store.state.auth.token || '';
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTQxNjM5ODQsImlhdCI6MTYxNDA3NzU4NCwidXNlcl9pZCI6InJpa3UifQ.ysrePOEfaxsi9QMVx67mrZ_kjzAE6K7mCPLZRAnfFaw';
+  if (request.url.includes(PAGES.LOGIN) || request.url.includes(PAGES.SIGNUP)) {
+    return Promise.resolve(request);
+  }
+  const token = store.state.auth.token || '';
   if (!token && !request.headers.noauth) {
     return Promise.reject(request);
   }
   request.headers.Authorization = `Bearer ${token}`;
-  // const userId = store.state.auth.userId || '';
-  const userId = 'riku';
+  const userId = store.state.auth.userId || '';
   if (!token && !request.headers.noauth) {
     return Promise.reject(request);
   }
