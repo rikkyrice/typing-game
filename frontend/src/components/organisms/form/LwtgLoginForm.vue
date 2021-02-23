@@ -33,6 +33,7 @@
         <v-text-field
           v-model="password"
           :rules="passwordRules"
+          :type="'password'"
           label="パスワード"
           required
         ></v-text-field>
@@ -42,7 +43,7 @@
           :label="formItem.title"
           :disabled="disabled"
           style="width: 150px;"
-          @click="postAnswer"
+          @click="login"
         />
       </v-row>
     </template>
@@ -53,9 +54,13 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component';
 import UtilMixin from '@/mixins/utilMixin';
+import UserApi from '@/api/user';
 import LwtgForm from '@/components/molecules/form/LwtgForm.vue'
 import LwtgButton from '@/components/atoms/LwtgButton.vue';
 import { FormItem } from '@/models/types/formItem';
+import { TokenInfo } from '@/models/user';
+import store from '@/store';
+import { TYPES } from '@/store/mutation-types';
 
 @Component({
   components: {
@@ -64,8 +69,35 @@ import { FormItem } from '@/models/types/formItem';
   },
 })
 export default class LwtgLoginForm extends mixins(UtilMixin) {
+  userId = '';
+  password = '';
+  tokenInfo: TokenInfo = {} as TokenInfo;
   formItem: FormItem = { title: 'ログイン', comment: 'まだ登録していない方は', link: '登録', path: '/signup' };
-
+  nameRules: any = [
+    (v: string) => !!v || 'ユーザーIDは必須です',
+    (v: string) => this.alphanumericRule(v),
+    (v: string) => this.lengthRule(v, 20),
+  ];
+  passwordRules: any = [
+    (v: string) => !!v || 'パスワードは必須です',
+    (v: string) => this.alphanumericRule(v),
+  ];
+  alphanumericRule(value: string) {
+    return value.match(/^[0-9a-z]+$/) || '英数字で入力してください';
+  }
+  lengthRule(value: string, length: number) {
+    return value.length <= length || length + '字以内で入力してください';
+  }
+  login() {
+    UserApi.login(this.userId, this.password)
+      .then((data) => {
+        this.tokenInfo = data;
+        store.dispatch(TYPES.LOGIN, this.tokenInfo);
+    })
+    .finally(() => {
+      this.$router.push('/mypage');
+    });
+  }
   pageTransition() {
     this.$router.push(this.formItem.path);
   }
