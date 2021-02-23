@@ -115,6 +115,7 @@
                     @click="wordVisibility"
                   />
                   <lwtg-icon-button
+                    v-if="isCardHover"
                     size="large"
                     :src="checkIconButton"
                     @click="patchRemember"
@@ -176,7 +177,6 @@ export default class WordListCard extends mixins(UtilMixin) {
   get checkIconButton() {
     const i =
       Number(this.word.isRemembered);
-    console.log(i);
     return this.checkIconSrcList[i];
   }
   get wordFont() {
