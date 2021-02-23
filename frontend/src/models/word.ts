@@ -4,7 +4,7 @@ export interface WordArray {
 }
 
 export interface Word {
-  wordId: string;
+  id: string;
   word: string;
   yomi: string;
   meaning: string;
