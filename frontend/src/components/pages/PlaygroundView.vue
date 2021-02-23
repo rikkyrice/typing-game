@@ -64,22 +64,17 @@
     <div class="pa-0" style="width: 100%;">
       <word-content
         :wordList="wordList"
-        :wordArray="wordArray"
+        :wordArray="getWords"
       />
     </div>
-    <typing-word-card
-      :width="'500'"
-      :border="'5'"
-      :primary="true"
-      :words="wordArray.words"
-    />
-    <lwtg-loader :page-loading="true" :loading="false" />
+    <lwtg-loader :page-loading="true" :loading="viewLoading" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component';
+import WordApi from '@/api/word';
 import CaContent from '@/components/organisms/CaContent.vue';
 import LwtgBreadcrumbs from '@/components/atoms/LwtgBreadcrumbs.vue';
 import LwtgButton from '@/components/atoms/LwtgButton.vue';
@@ -130,6 +125,7 @@ export default class PlaygroundView extends mixins(UtilMixin) {
   isPlayButtonHover = false;
   isTrashcanButtonHover = false;
   isContinued!: boolean;
+  wordArrayLoading = false;
   caItems: CaItem[] = [
     { title: 'CyberAgent Way', subtitle: '人と企業が成長する仕組み', path: '/', img: '#' },
     { title: 'CSR', subtitle: '社会的責任', path: '/', img: '#' },
@@ -144,87 +140,9 @@ export default class PlaygroundView extends mixins(UtilMixin) {
       updatedAt: '2021-02-06-00:00:00',
   }
   wordArray: WordArray = {
-    matched: 5,
-    words: [
-      {
-        wordId: '8e97230e-2c9d-44ed-9a95-e39aa6217dd7',
-        word: '愛飢えお',
-        yomi: 'あいうえおきゅきゅ',
-        meaning: 'あいうえお',
-        mYomi: 'あいうえお',
-        explanation: '50音最初の5文字',
-        isRemembered: true,
-        createdAt: '2020-10-03-21.50.00.000000',
-        updatedAt: '2020-10-03-21.50.00.000000',
-      },
-      {
-        wordId: '8e97230e-2c9d-44ed-9a95-e39aa6217dd7',
-        word: 'oc login',
-        yomi: '',
-        meaning: '組織、企業',
-        mYomi: 'かきくけこ',
-        explanation: 'おーがにぜーしょん',
-        isRemembered: true,
-        createdAt: '2020-10-03-21.50.00.000000',
-        updatedAt: '2020-10-03-21.50.00.000000',
-      },
-      {
-        wordId: '90443017-7096-4e67-9ada-863f581bd1a7',
-        word: 'communication',
-        yomi: '',
-        meaning: 'コミュニケーション',
-        mYomi: 'かきくけこ',
-        explanation: '大事',
-        isRemembered: false,
-        createdAt: '2020-10-03-21.51.00.000000',
-        updatedAt: '2020-10-03-21.51.00.000000',
-      },
-      {
-        wordId: 'b5f888bd-d8c6-4d74-a61c-ef838d8b52d9',
-        word: 'government',
-        yomi: '',
-        meaning: '陰謀ありあり',
-        mYomi: 'かきくけこ',
-        explanation: '政府',
-        isRemembered: false,
-        createdAt: '2020-10-03-21.52.00.000000',
-        updatedAt: '2020-10-03-21.52.00.000000',
-      },
-      {
-        wordId: '48d4becc-f73c-45f7-8cb5-a9dee4c4f214',
-        word: 'authentication',
-        yomi: '',
-        meaning: 'ここには何でも',
-        mYomi: 'かきくけこ',
-        explanation: '認証',
-        isRemembered: true,
-        createdAt: '2020-10-03-21.53.00.000000',
-        updatedAt: '2020-10-03-21.53.00.000000',
-      }
-    ]
-  }
-  // typeWords: TypeWord[] = [
-  //   {
-  //     word: `oc whoami`,
-  //     yomi: '',
-  //     typeWord: [
-  //       ['o'],
-  //       ['c'],
-  //       [' '],
-  //       ['w'],
-  //       ['h'],
-  //       ['o'],
-  //       ['a'], 'm', 'i'],
-  //     ],
-  //   },
-  //   {
-  //     word: `oc login`,
-  //     yomi: '',
-  //     typeWord: [
-  //       ['o', 'c', ' ', 'l', 'o', 'g', 'i', 'n'],
-  //     ],
-  //   },
-  // ];
+    matched: 0,
+    words: [],
+  };
   get isDesktop() {
     return deviceType === DeviceType.DESKTOP;
   }
@@ -237,6 +155,25 @@ export default class PlaygroundView extends mixins(UtilMixin) {
     return this.isDesktop && this.isTrashcanButtonHover
       ? require('@/assets/common/trash-can.svg')
       : require('@/assets/common/trash-can-outline.svg');
+  }
+  get viewLoading() {
+    return (
+      this.wordArrayLoading
+    );
+  }
+  get getWords() {
+    return this.wordArray;
+  }
+  created() {
+    this.fetchWordArray();
+  }
+  fetchWordArray() {
+    this.wordArrayLoading = true;
+    WordApi.getWords('5f52039d-d983-4ebd-90b2-e3e04f821896')
+      .then((data) => {
+        this.wordArray = data;
+    })
+    .finally(() => (this.wordArrayLoading = false));
   }
 }
 </script>
