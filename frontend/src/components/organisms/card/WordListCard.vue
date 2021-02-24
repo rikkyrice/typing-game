@@ -17,13 +17,13 @@
             <v-col cols="12" sm="6" md="9">
               <div style="width: 100%;">
                 <span
-                  class="bold"
+                  class="bold main-mono-color"
                   :style="fontSizeUtil(24, 24, 20)"
-                >{{ wordlist.wordListTitle }}</span>
+                >{{ wordlist.title }}</span>
               </div>
               <div style="width: 100%;">
                 <span
-                  class="mono-60-color"
+                  class="main-mono-color"
                   :style="fontSizeUtil(16, 16, 12)"
                 >{{ wordlist.explanation }}</span>
               </div>
@@ -35,7 +35,7 @@
                 no-gutters
               >
                 <v-col style="text-align: right" :style="fontSizeUtil(16, 16, 12)">
-                  <span class="bold">単語数: {{ wordArray.matched }}</span>
+                  <span class="bold main-mono-color">単語数: {{ wordArray.matched }}</span>
                 </v-col>
                 <v-spacer />
                 <v-col class="d-flex" :style="fontSizeUtil(12, 12, 12)">

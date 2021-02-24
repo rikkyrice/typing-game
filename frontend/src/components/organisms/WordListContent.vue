@@ -10,7 +10,7 @@
             <div class="mr-auto">
               <span
                 :style="fontSizeUtil(24, 24, 20)"
-                class="bold"
+                class="bold main-mono-color"
               >単語帳</span>
               <v-btn
                 :icon="true"
@@ -32,7 +32,7 @@
         </v-col>
         <v-spacer />
       </v-row>
-      <v-row v-for="wordList in wordListArray.wordLists" :key="wordList.wordListId" class="px-12">
+      <v-row v-for="wordList in wordListArray.wordlists" :key="wordList.id" class="px-12">
         <v-col cols="11" class="pa-0">
           <word-list-card
             :wordlist="wordList"
@@ -46,7 +46,7 @@
                 :icon="true"
                 :large="true"
                 class="play-button"
-                @click="playTypingGame(wordList.wordListId)"
+                @click="playTypingGame(wordList.id)"
               >
                 <v-icon size="36px" color="#A0D0A0"
                 >mdi-arrow-right-circle</v-icon>
