@@ -159,7 +159,6 @@ export default class PlaygroundView extends mixins(UtilMixin) {
     );
   }
   get getWords() {
-    // console.log('pg.isRemembered:' + this.wordArray.words[0].isRemembered)
     return this.wordArray;
   }
   created() {
