@@ -12,7 +12,7 @@
       >マイページ</span>
     </div>
     <div class="pa-16 lwtg-secondary-bg" style="width: 100%;">
-      <word-list-content :wordListArray="wordListArray" />
+      <word-list-content :wordListArray="getWordLists" />
     </div>
     <lwtg-loader :page-loading="true" :loading="false" />
   </div>
@@ -22,11 +22,14 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component';
 import UtilMixin from '@/mixins/utilMixin';
+import WordListApi from '@/api/wordlist';
 import LwtgBreadcrumbs from '@/components/atoms/LwtgBreadcrumbs.vue';
 import LwtgLoader from '@/components/atoms/LwtgLoader.vue';
 import WordListContent from '@/components/organisms/WordListContent.vue';
 import { BreadcrumbInfo } from '@/models/types/breadcrumbInfo';
 import { WordListArray } from '@/models/wordlist';
+import store from '@/store';
+import { TYPES } from '@/store/mutation-types';
 
 @Component({
   components: {
@@ -41,27 +44,30 @@ export default class MyPageView extends mixins(UtilMixin) {
     { label: 'My Page', path: '/mypage' },
   ];
   wordListArray: WordListArray = {
-    matched: 3,
-    wordLists: [
-      { id: '1',
-        title: 'TOEIC',
-        explanation: 'TOEICの頻出単語を単語帳にしました！ぜひ使って990点めざしましょう!',
-        createdAt: '2021-02-06-00:00:00',
-        updatedAt: '2021-02-06-00:00:00',
-      },
-      { id: '2',
-        title: '基本情報',
-        explanation: 'TOEICの頻出単語を単語帳にしました！ぜひ使って990点めざしましょう!',
-        createdAt: '2021-02-06-00:00:00',
-        updatedAt: '2021-02-06-00:00:00',
-      },
-      { id: '3',
-        title: 'OpenShift',
-        explanation: 'TOEICの頻出単語を単語帳にしました！ぜひ使って990点めざしましょう!',
-        createdAt: '2021-02-06-00:00:00',
-        updatedAt: '2021-02-06-00:00:00',
-      },
-    ]
+    matched: 0,
+    wordlists: [],
+  }
+  userId = store.state.auth.userId;
+  wordListLoading = false;
+
+  get viewLoading() {
+    return (
+      this.wordListLoading
+    );
+  }
+  get getWordLists() {
+    return this.wordListArray;
+  }
+  created() {
+    this.fetchGetWordList();
+  }
+  fetchGetWordList() {
+    this.wordListLoading = true;
+    WordListApi.getWordLists()
+      .then((data) => {
+        this.wordListArray = data;
+      })
+      .finally(() => (this.wordListLoading = false));
   }
 }
 </script>
