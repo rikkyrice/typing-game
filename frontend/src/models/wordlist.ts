@@ -1,6 +1,6 @@
 export interface WordListArray {
   matched: number;
-  wordLists: WordList[];
+  wordlists: WordList[];
 }
 
 export interface WordList {
