@@ -11,11 +11,11 @@
       >
         <v-row style="width: 100%;">
           <v-spacer />
-          <v-col cols="4" style="text-align: center;">
+          <v-col cols="6" style="text-align: center;">
             <span class="bold" :style="fontSizeUtil(24, 24, 20)"
             >{{ wordList.title }}</span>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="3">
             <lwtg-icon-button
               size="small"
               :icon="'lead-pencil'"
@@ -90,6 +90,7 @@
         </v-col>
         <v-spacer />
       </v-row>
+      <div style="height: 100px; width: 100%;" />
     </div>
   </div>
 </template>
