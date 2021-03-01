@@ -14,3 +14,20 @@ export interface Word {
   createdAt: string;
   updatedAt: string;
 }
+
+export const initializedWordArray: WordArray = {
+    matched: 0,
+    words: [
+      {
+        id: '',
+        word: '',
+        yomi: '',
+        meaning: '',
+        mYomi: '',
+        explanation: '',
+        isRemembered: false,
+        createdAt: '',
+        updatedAt: '',
+      },
+    ],
+}
