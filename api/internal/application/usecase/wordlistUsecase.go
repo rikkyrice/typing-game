@@ -12,7 +12,8 @@ import (
 
 // WordListUseCase 単語帳のサービスインターフェース
 type WordListUseCase interface {
-	GetWordList(userID string) ([]*model.WordList, *apierror.Error)
+	GetWordLists(userID string) ([]*model.WordList, *apierror.Error)
+	GetWordList(wordListID string) (*model.WordList, *apierror.Error)
 	PostWordList(wordlist model.WordList) (*model.WordList, *apierror.Error)
 	PutWordList(id string, wordlist model.WordList) (*model.WordList, *apierror.Error)
 	DeleteWordList(id string) *apierror.Error
@@ -29,13 +30,21 @@ type wordlistUseCase struct {
 	WordListRepository repository.WordListRepository
 }
 
-func (wl *wordlistUseCase) GetWordList(userID string) ([]*model.WordList, *apierror.Error) {
+func (wl *wordlistUseCase) GetWordLists(userID string) ([]*model.WordList, *apierror.Error) {
 	wordlists := []*model.WordList{}
 	wordlists, err := wl.WordListRepository.FindWordListByUserID(userID)
 	if err != nil {
 		return wordlists, err
 	}
 	return wordlists, nil
+}
+
+func (wl *wordlistUseCase) GetWordList(wordListID string) (*model.WordList, *apierror.Error) {
+	wordlist, err := wl.WordListRepository.FindWordListByID(wordListID)
+	if err != nil {
+		return wordlist, err
+	}
+	return wordlist, nil
 }
 
 func (wl *wordlistUseCase) PostWordList(wordlist model.WordList) (*model.WordList, *apierror.Error) {

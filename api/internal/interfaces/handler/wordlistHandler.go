@@ -11,6 +11,7 @@ import (
 
 // WordListHandler 単語帳ハンドラインターフェース
 type WordListHandler interface {
+	GETWordLists() echo.HandlerFunc
 	GETWordList() echo.HandlerFunc
 	POSTWordList() echo.HandlerFunc
 	PUTWordList() echo.HandlerFunc
@@ -51,7 +52,7 @@ type wordlistsResponse struct {
 	WordLists []*wordlistResponse `json:"wordlists"`
 }
 
-func (wl *wordlistHandler) GETWordList() echo.HandlerFunc {
+func (wl *wordlistHandler) GETWordLists() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		userID, err := usecase.Authenticate(c)
 		if err != nil {
@@ -59,7 +60,7 @@ func (wl *wordlistHandler) GETWordList() echo.HandlerFunc {
 		}
 		c.Echo().Logger.Info("認証OK")
 
-		wordlists, err := wl.WordListUseCase.GetWordList(userID)
+		wordlists, err := wl.WordListUseCase.GetWordLists(userID)
 		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
@@ -71,6 +72,28 @@ func (wl *wordlistHandler) GETWordList() echo.HandlerFunc {
 			Matched:   len(wordlists),
 			WordLists: wls,
 		}
+		return c.JSON(http.StatusOK, res)
+	}
+}
+
+func (wl *wordlistHandler) GETWordList() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
+			return c.JSON(err.StatusCode, err)
+		}
+		c.Echo().Logger.Info("認証OK")
+		pathParams, err := getPathParams(c)
+		if err != nil {
+			c.Echo().Logger.Errorf("パスパラメータの読み込みに失敗しました。%+v", err)
+			return c.JSON(err.StatusCode, err)
+		}
+
+		wordlist, err := wl.WordListUseCase.GetWordList(pathParams.ID)
+		if err != nil {
+			return c.JSON(err.StatusCode, err)
+		}
+		res := toWordlistResponse(wordlist)
 		return c.JSON(http.StatusOK, res)
 	}
 }
