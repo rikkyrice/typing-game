@@ -11,7 +11,7 @@
             <span
               class="bold main-mono-color"
               :style="fontSizeUtil(24, 24, 20)"
-            >{{ wordList.wordListTitle }}</span>
+            >{{ wordList.title }}</span>
           </div>
           <div>
             <span
