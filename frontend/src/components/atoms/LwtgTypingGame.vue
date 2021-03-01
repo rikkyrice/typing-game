@@ -8,18 +8,18 @@
             'main-mono-color': isActivated || wordOnly,
             'mono-30-color': !isActivated && !wordOnly,
           }"
-          :style="fontSizeUtil(42, 42, 32)"
+          :style="typeWord.word.length < 30 ? fontSizeUtil(32, 32, 26) : fontSizeUtil(24, 24, 20)"
         >{{ typeWord.word }}</span>
       </div>
-      <div v-if="typeWord.yomi" class="text-center">
+      <!-- <div v-if="typeWord.yomi" class="text-center">
         <span
           :class="{
             'main-mono-color': isActivated,
             'mono-30-color': !isActivated,
           }"
-          :style="fontSizeUtil(24, 24, 16)"
+          :style="fontSizeUtil(20, 20, 16)"
         >{{ typeWord.yomi }}</span>
-      </div>
+      </div> -->
       <div class="d-flex justify-center text-center">
         <div class="text-center">
           <span
@@ -97,8 +97,9 @@ export default class LwtgTypingGame extends mixins(UtilMixin) {
     // 今後判定する必要のないタイプワードは削除するためそのindexを取得
     var removeList = this.findRemoveIndex(target, code);
     // 削除対象のindexを削除
-    for (var r of removeList) {
-      this.typeWords[this.nextIndex].splice(r, 1);
+    for (var i = 0; i < removeList.length; i++) {
+      this.typeWords[this.nextIndex].splice(removeList[i], 1);
+      removeList = removeList.map((v) => (v -= 1));
     }
     // 残ったそれぞれのタイプワードの一文字目を削除
     this.typeWords[this.nextIndex] = this.typeWords[this.nextIndex].map((str: string) => str.slice(1));
