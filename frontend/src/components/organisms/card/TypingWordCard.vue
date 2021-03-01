@@ -26,7 +26,7 @@
           style="width: 100%; height: 100%;"
           class="d-flex justify-center align-center"
         >
-          <div>
+          <div style="width: 100%;">
             <lwtg-typing-game
               v-if="!clear"
               :key="key"
@@ -46,7 +46,7 @@
           style="width: 100%; height: 100%;"
           class="d-flex justify-center align-center meaning-card"
         >
-          <div>
+          <div style="width: 100%;">
             <lwtg-typing-game
               v-if="!clear"
               :key="key"
@@ -62,12 +62,12 @@
                 'main-mono-color': isActivated || wordOnly,
                 'mono-30-color': !isActivated && !wordOnly,
               }"
-              :style="fontSizeUtil(24, 24, 32)"
+              :style="fontSizeUtil(20, 20, 18)"
             >{{ words[index].explanation }}</span>
             <span
               v-else
               class="bold main-mono-color"
-              :style="fontSizeUtil(24, 24, 32)"
+              :style="fontSizeUtil(24, 24, 18)"
             >- Press Space to Restart -</span>
           </div>
         </div>
@@ -84,7 +84,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component';
 import UtilMixin from '@/mixins/utilMixin';
 import LwtgWordCard from '@/components/atoms/LwtgWordCard.vue';
@@ -119,27 +119,30 @@ export default class TypingWordCard extends mixins(UtilMixin) {
   get getIsActivated() {
     return this.isActivated
   }
-  dipatchTypeWord() {
+  dispatchTypeWord() {
     if (this.isWords) {
       store.dispatch(TYPES.SHIFT_TYPEWORD, this.typeWords[this.index]);
     } else {
       store.dispatch(TYPES.SHIFT_TYPEMEANING, this.typeWords[this.index]);
     }
   }
-  created() {
-    this.createTypeWords(this.isWords);
-  }
   mounted() {
     window.addEventListener('resize', this.handleResize);
     if (!this.width) {
       this.handleResize();
     }
-    this.dipatchTypeWord();
+    this.dispatchTypeWord();
     window.addEventListener('keydown', e => {
       if (store.state.gameCleared) {
         this.keyDown(e.key);
       }
     });
+  }
+  @Watch('words')
+  updateWords(newWords: Word[]) {
+    Promise.resolve()
+      .then(() => (this.createTypeWords(this.isWords)))
+      .finally(() => (this.dispatchTypeWord()));
   }
   handleResize() {
     const typingWordCard = document.getElementById(
@@ -169,14 +172,14 @@ export default class TypingWordCard extends mixins(UtilMixin) {
       this.clear = true;
       store.dispatch(TYPES.SWITCH_CLEARED, true);
     } else {
-      this.dipatchTypeWord();
+      this.dispatchTypeWord();
     }
   }
   reset() {
     store.dispatch(TYPES.SWITCH_CLEARED, false);
     this.clear = false;
     this.index = 0;
-    this.dipatchTypeWord();
+    this.dispatchTypeWord();
     this.key = this.key ? 0 : 1;
   }
   // Wordsでfor文を作成
@@ -203,6 +206,7 @@ export default class TypingWordCard extends mixins(UtilMixin) {
       var typeWord = new TypeWord(word, yomi, tw)
       this.typeWords.push(typeWord);
     }
+    console.log(this.typeWords);
   }
   parseKanaSentence(str: string) {
     var res: string[] = [];
