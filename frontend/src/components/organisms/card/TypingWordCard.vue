@@ -55,15 +55,6 @@
               :wordOnly="wordOnly"
               @shift="shift"
             />
-            <v-divider />
-            <span
-              v-if="!clear"
-              :class="{
-                'main-mono-color': isActivated || wordOnly,
-                'mono-30-color': !isActivated && !wordOnly,
-              }"
-              :style="fontSizeUtil(20, 20, 18)"
-            >{{ words[index].explanation }}</span>
             <span
               v-else
               class="bold main-mono-color"
@@ -174,6 +165,13 @@ export default class TypingWordCard extends mixins(UtilMixin) {
     } else {
       this.dispatchTypeWord();
     }
+  }
+  shuffle(randomNum: number) {
+    for (var i = this.typeWords.length; i > 1; i--) {
+      var k = Math.floor(randomNum * i);
+      [this.typeWords[k], this.typeWords[i - 1]] = [this.typeWords[i - 1], this.typeWords[k]];
+    }
+    this.reset();
   }
   reset() {
     store.dispatch(TYPES.SWITCH_CLEARED, false);

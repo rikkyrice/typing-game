@@ -1,5 +1,5 @@
 <template>
-  <div class="lwtg-typing-game">
+  <div class="lwtg-typing-game px-6">
     <div class="d-flex flex-column">
       <div class="text-center">
         <span
@@ -8,7 +8,7 @@
             'main-mono-color': isActivated || wordOnly,
             'mono-30-color': !isActivated && !wordOnly,
           }"
-          :style="typeWord.word.length < 30 ? fontSizeUtil(32, 32, 26) : fontSizeUtil(24, 24, 20)"
+          :style="wordFontStyle"
         >{{ typeWord.word }}</span>
       </div>
       <!-- <div v-if="typeWord.yomi" class="text-center">
@@ -20,20 +20,19 @@
           :style="fontSizeUtil(20, 20, 16)"
         >{{ typeWord.yomi }}</span>
       </div> -->
-      <div class="d-flex justify-center text-center">
-        <div class="text-center">
+      <v-divider />
+      <div class="d-flex justify-center">
+        <div class="d-flex flex-wrap">
           <span
             v-for="(cw, i) in clearedWords"
             :key="i"
             class="bold mono-30-color"
-            :style="fontSizeUtil(24, 24, 32)"
+            :style="typeFontStyle"
           >
             <span v-if="cw !== ' '"
             >{{ cw }}</span>
             <span v-else class="space"></span>
           </span>
-        </div>
-        <div class="text-center">
           <span
             v-for="(tw, j) in typeWords"
             :key="j"
@@ -47,7 +46,7 @@
                 'mono-30-color': !isActivated,
               }"
               class="bold"
-              :style="fontSizeUtil(24, 24, 32)"
+              :style="typeFontStyle"
             >
               <span v-if="t !== ' '">{{ t }}</span>
               <span v-else class="space"></span>
@@ -76,6 +75,16 @@ export default class LwtgTypingGame extends mixins(UtilMixin) {
   clearedWords: string[] = [];
   typedWord = '';
   nextIndex = 0;
+  get wordFontStyle() {
+    return this.typeWord.word.length < 30
+        ? this.fontSizeUtil(32, 32, 26)
+        : this.fontSizeUtil(24, 24, 20);
+  }
+  get typeFontStyle() {
+    return this.typeWord.word.length < 30
+        ? this.fontSizeUtil(24, 24, 20)
+        : this.fontSizeUtil(16, 16, 10);
+  }
   mounted() {
     window.addEventListener('keydown', e => {
       if (this.isActivated && !store.state.gameCleared) {

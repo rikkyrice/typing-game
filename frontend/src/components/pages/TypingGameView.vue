@@ -14,7 +14,7 @@
     <div class="pa-0" style="width: 100%;">
       <typing-game-content
         :wordList="wordList"
-        :wordArray="getWordArray"
+        :words="getWords"
       />
     </div>
     <lwtg-loader :page-loading="true" :loading="false" />
@@ -51,10 +51,10 @@ export default class WordListView extends mixins(UtilMixin) {
   }
   wordListLoading = false;
   wordsLoading = false;
-  get getWordArray() {
+  get getWords() {
     return this.wordArray.matched !== 0
-      ? this.wordArray
-      : initializedWordArray
+      ? this.wordArray.words
+      : initializedWordArray.words
   }
   get viewLoading() {
     return (
@@ -83,6 +83,10 @@ export default class WordListView extends mixins(UtilMixin) {
     WordApi.getWords(this.$route.params.wordlistId)
       .then((data) => {
         this.wordArray = data;
+        for (var i = this.wordArray.words.length; i > 1; i--) {
+          var k = Math.floor(Math.random() * i);
+          [this.wordArray.words[k], this.wordArray.words[i - 1]] = [this.wordArray.words[i - 1], this.wordArray.words[k]];
+        }
       })
       .finally(() => (this.wordsLoading = false));
   }
