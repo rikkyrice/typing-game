@@ -65,5 +65,8 @@
       "vue-cli-service lint",
       "git add"
     ]
+  },
+  "rules": {
+    "no-console": 0
   }
 }
