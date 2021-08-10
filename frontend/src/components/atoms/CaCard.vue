@@ -46,7 +46,6 @@ export default class CaCard extends mixins(UtilMixin) {
 <style scoped lang="scss">
 @import '@/style.scss';
 .hover-animation-card {
-
   transition: all .2s ease-out;
 }
 .hover-animation-card:hover {
