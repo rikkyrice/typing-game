@@ -6,11 +6,7 @@
         :class="MdSmXsUtil('py-4', 'py-3', 'py-3')"
         :breadcrumbs="breadcrumbs"
       />
-    </div>
-    <div class="px-16 mb-6 lwtg-white-bg" style="width: 100%;">
-      <span class="bold main-mono-color" :style="fontSizeUtil(28, 28, 24)"
-      >{{ wordList.wordListTitle }}</span>
-    </div>
+    </div>ß
     <div class="pa-0" style="width: 100%;">
       <word-content
         :wordList="wordList"

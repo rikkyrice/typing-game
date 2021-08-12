@@ -7,10 +7,6 @@
         :breadcrumbs="breadcrumbs"
       />
     </div>
-    <div class="px-16 mb-6 lwtg-white-bg" style="width: 100%;">
-      <span class="bold main-mono-color" :style="fontSizeUtil(28, 28, 24)"
-      >マイページ</span>
-    </div>
     <div class="pa-16 lwtg-secondary-bg" style="width: 100%;">
       <word-list-content :wordListArray="getWordLists" />
     </div>

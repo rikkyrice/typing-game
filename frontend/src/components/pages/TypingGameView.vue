@@ -7,10 +7,6 @@
         :breadcrumbs="breadcrumbs"
       />
     </div>
-    <div class="px-16 mb-6 lwtg-white-bg" style="width: 100%;">
-      <span class="bold main-mono-color" :style="fontSizeUtil(28, 28, 24)"
-      >タイピングゲーム</span>
-    </div>
     <div class="pa-0" style="width: 100%;">
       <typing-game-content
         :wordList="wordList"

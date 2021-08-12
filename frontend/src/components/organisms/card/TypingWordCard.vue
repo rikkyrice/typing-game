@@ -26,7 +26,7 @@
           style="width: 100%; height: 100%;"
           class="d-flex justify-center align-center"
         >
-          <div style="width: 100%;">
+          <div style="width: 100%;" class="text-center">
             <lwtg-typing-game
               v-if="!clear"
               :key="key"
@@ -46,7 +46,7 @@
           style="width: 100%; height: 100%;"
           class="d-flex justify-center align-center meaning-card"
         >
-          <div style="width: 100%;">
+          <div style="width: 100%;" class="text-center">
             <lwtg-typing-game
               v-if="!clear"
               :key="key"
