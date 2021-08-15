@@ -1,11 +1,11 @@
 export class TypeWord {
-  word: string;
+  name: string;
   yomi: string;
-  typeWord: string[][];
+  types: string[][];
 
-  constructor(word: string, yomi: string, typeWord: string[][]) {
-    this.word = word;
+  constructor(name: string, yomi: string, types: string[][]) {
+    this.name = name;
     this.yomi = yomi;
-    this.typeWord = typeWord;
+    this.types = types;
   }
 }

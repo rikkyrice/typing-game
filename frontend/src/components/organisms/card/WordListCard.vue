@@ -35,16 +35,16 @@
                 no-gutters
               >
                 <v-col style="text-align: right" :style="fontSizeUtil(16, 16, 12)">
-                  <span class="bold main-mono-color">単語数: {{ wordArray.matched }}</span>
+                  <span class="bold main-mono-color">単語数: {{ wordlist.wordCount }}</span>
                 </v-col>
                 <v-spacer />
                 <v-col class="d-flex" :style="fontSizeUtil(12, 12, 12)">
-                  <div class="ml-auto">
+                  <div class="mr-auto">
                     <div>
-                      <span>プレイ回数: {{ score.playCount }}</span>
+                      <span>プレイ回数: {{ wordlist.playCount }}</span>
                     </div>
                     <div>
-                      <span>プレイ日時: {{ score.playedAt }}</span>
+                      <span>プレイ日時: {{ wordlist.playedAt }}</span>
                     </div>
                   </div>
                 </v-col>
@@ -95,8 +95,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { mixins } from 'vue-class-component';
 import UtilMixin from '@/mixins/utilMixin';
 import LwtgIconButton from '@/components/atoms/LwtgIconButton.vue';
-import { WordList } from '@/models/wordlist';
-import { WordArray } from '@/models/word';
+import { WordListSummary } from '@/models/wordlist';
 import { Score } from '@/models/score';
 import store from '@/store';
 import { DeviceType, deviceType } from '@/models/types/deviceType';
@@ -108,20 +107,7 @@ import { MenuItem } from '@/models/types/menuItem';
   }
 })
 export default class WordListCard extends mixins(UtilMixin) {
-  @Prop() wordlist!: WordList;
-  // @Prop() wordArray!: WordArray;
-  wordArray: WordArray = {
-    matched: 0,
-    words: [],
-  }
-  // @Prop() score!: Score;
-  score: Score = {
-    scoreId: 0,
-    playCount: 1,
-    clearTypeCount: 100,
-    missTypeCount: 1,
-    playedAt: '2021-02-06-00:00:00',
-  }
+  @Prop() wordlist!: WordListSummary;
   menuItems: MenuItem[] = [
     { title: '編集', danger: false, action: 'edit' },
     { title: '削除', danger: true, action: 'delete' },

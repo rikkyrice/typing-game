@@ -33,10 +33,12 @@
             ref="childWords"
             :border="'10'"
             :primary="true"
-            :words="getWords"
+            :words="getTypingWords"
             :isActivated="shiftController"
+            :width="width"
             @shift="shift"
             @reset="reset"
+            @updateWidth="updateWidth"
           />
         </v-col>
         <v-col cols="1">
@@ -56,23 +58,6 @@
           </div>
         </v-col>
       </v-row>
-      <v-row>
-        <v-spacer />
-        <v-col cols="10">
-          <typing-word-card
-            ref="childMeanings"
-            :border="'10'"
-            :primary="true"
-            :words="getWords"
-            :isWords="false"
-            :isActivated="!shiftController"
-            :wordOnly="wordOnly"
-            @shift="shift"
-            @reset="reset"
-          />
-        </v-col>
-        <v-spacer />
-      </v-row>
     </div>
   </div>
 </template>
@@ -83,7 +68,7 @@ import { mixins } from 'vue-class-component';
 import UtilMixin from '@/mixins/utilMixin';
 import TypingWordCard from '@/components/organisms/card/TypingWordCard.vue';
 import { WordList } from '@/models/wordlist';
-import { WordArray, Word } from '@/models/word';
+import { TypingWord, Word } from '@/models/word';
 import store from '@/store';
 import { TYPES } from '@/store/mutation-types';
 
@@ -94,11 +79,12 @@ import { TYPES } from '@/store/mutation-types';
 })
 export default class TypingGameContent extends mixins(UtilMixin) {
   @Prop() wordList!: WordList;
-  @Prop() words!: Word[];
+  @Prop() typingWords!: TypingWord[];
   shiftController = true;
   wordOnly = false;
-  get getWords() {
-    return this.words;
+  width: number = 0;
+  get getTypingWords() {
+    return this.typingWords;
   }
   created() {
     store.dispatch(TYPES.SWITCH_CLEARED, false);
@@ -112,19 +98,19 @@ export default class TypingGameContent extends mixins(UtilMixin) {
     }
     if (this.shiftController || this.wordOnly) {
       this.refs().childWords.shiftIndex();
-      this.refs().childMeanings.shiftIndex();
     }
   }
   shuffle() {
     var randomNum: number = Math.random();
     this.shiftController = true;
     this.refs().childWords.shuffle(randomNum);
-    this.refs().childMeanings.shuffle(randomNum);
   }
   reset() {
     this.shiftController = true;
     this.refs().childWords.reset();
-    this.refs().childMeanings.reset();
+  }
+  updateWidth(value: any): void {
+    this.width = value;
   }
 }
 </script>

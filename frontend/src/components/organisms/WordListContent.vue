@@ -3,7 +3,7 @@
     id="wordListContent"
     class="lwtg-white-bg"
   >
-    <div class="px-12 py-6">
+    <div class="pl-12 py-6">
       <v-row class="px-12">
         <v-col cols="11" class="pa-0">
           <div class="d-flex align-center">
@@ -76,7 +76,7 @@ import UtilMixin from '@/mixins/utilMixin';
 import LwtgIconButton from '@/components/atoms/LwtgIconButton.vue';
 import LwtgChip from '@/components/atoms/LwtgChip.vue';
 import WordListCard from '@/components/organisms/card/WordListCard.vue';
-import { WordListArray } from '@/models/wordlist';
+import { WordListSummaryArray } from '@/models/wordlist';
 
 @Component({
   components: {
@@ -86,7 +86,7 @@ import { WordListArray } from '@/models/wordlist';
   },
 })
 export default class WordListContent extends mixins(UtilMixin) {
-  @Prop() wordListArray!: WordListArray;
+  @Prop() wordListArray!: WordListSummaryArray;
   playTypingGame(id: string) {
     this.$router.push(`mypage/${id}/typing-game`, () => {});
   }

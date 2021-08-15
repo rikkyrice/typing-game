@@ -1,6 +1,6 @@
 import APIClient from '@/api/common/apiClient';
 import { API_PATHS } from '@/api/common/apiPaths';
-import { WordArray, Word } from '@/models/word';
+import { WordArray, TypingWordArray, Word } from '@/models/word';
 
 function getWords(wordListId: string) {
   return APIClient.getAPI<WordArray>(API_PATHS.WORDS.GET(wordListId))
@@ -60,6 +60,12 @@ function deleteWordList(wordId: string) {
   );
 }
 
+function getTypingWords(wordListId: string) {
+  return APIClient.getAPI<TypingWordArray>(API_PATHS.TYPING.GET(wordListId))
+    .then((data) => Promise.resolve(data))
+    .catch((err) => Promise.reject(err));
+}
+
 interface WordRequestBody {
   wordListId: string;
   word: string;
@@ -74,4 +80,5 @@ export default {
   postWord,
   putWordList,
   deleteWordList,
+  getTypingWords
 }

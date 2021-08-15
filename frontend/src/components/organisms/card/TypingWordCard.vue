@@ -1,76 +1,60 @@
 <template>
   <div
     id="typing-word-card"
-    class="d-flex justify-center align-center"
+    class="d-flex justify-center align-center flip-card"
     style="width: 100%; height: 100%;"
   >
-    <div
-      v-if="!isWords"
-      style="height: 100%;"
-      :style="{
-        width: (width / 9) + 'px',
-      }"
-    />
     <lwtg-word-card
       :width="width"
       :border="border"
       :primary="primary"
-      class="lwtg-word-card"
+      class="lwtg-word-card flip-card-inner"
       :class="{
-        'meaning-card': !isWords,
+        'flipped-card': !isActivated,
       }"
     >
       <template #word>
         <div
-          v-if="isWords"
           style="width: 100%; height: 100%;"
           class="d-flex justify-center align-center"
+          :class="{
+            'flipped-card': !isActivated,
+          }"
         >
           <div style="width: 100%;" class="text-center">
             <lwtg-typing-game
-              v-if="!clear"
+              v-if="!clear && isActivated"
               :key="key"
               :typeWord="typeWord"
               :isActivated="getIsActivated"
               @shift="shift"
             />
-            <span
-              v-else
-              class="bold main-mono-color"
-              :style="fontSizeUtil(48, 48, 32)"
-            >Clear!</span>
-          </div>
-        </div>
-        <div
-          v-else
-          style="width: 100%; height: 100%;"
-          class="d-flex justify-center align-center meaning-card"
-        >
-          <div style="width: 100%;" class="text-center">
             <lwtg-typing-game
-              v-if="!clear"
+              v-else-if="!clear && !isActivated"
               :key="key"
-              :typeWord="typeWord"
+              :typeWord="typeMeaning"
               :isActivated="getIsActivated"
               :wordOnly="wordOnly"
               @shift="shift"
             />
-            <span
+            <div
               v-else
-              class="bold main-mono-color"
-              :style="fontSizeUtil(24, 24, 18)"
-            >- Press Space to Restart -</span>
+              style="width: 100%"
+              class="text-center"
+            >
+              <span
+                class="bold main-mono-color"
+                :style="fontSizeUtil(48, 48, 32)"
+              >Clear!</span><br>
+              <span
+                class="bold main-mono-color"
+                :style="fontSizeUtil(24, 24, 18)"
+              >- Press Space to Restart -</span>
+            </div>
           </div>
         </div>
       </template>
     </lwtg-word-card>
-    <div
-      v-if="isWords"
-      style="height: 100%;"
-      :style="{
-        width: (width / 9) + 'px',
-      }"
-    />
   </div>
 </template>
 
@@ -80,7 +64,7 @@ import { mixins } from 'vue-class-component';
 import UtilMixin from '@/mixins/utilMixin';
 import LwtgWordCard from '@/components/atoms/LwtgWordCard.vue';
 import LwtgTypingGame from '@/components/atoms/LwtgTypingGame.vue';
-import { Word } from '@/models/word';
+import { TypingWord, Word } from '@/models/word';
 import { TypeWord } from '@/models/types/typeWord';
 import { mp } from '@/models/types/kana';
 import store from '@/store';
@@ -96,33 +80,32 @@ export default class TypingWordCard extends mixins(UtilMixin) {
   @Prop() width!: number;
   @Prop({ default: '10px' }) border!: number;
   @Prop() primary!: boolean;
-  @Prop() words!: Word[];
+  @Prop() words!: TypingWord[];
   @Prop() isActivated!: boolean;
   @Prop({ default: true }) isWords!: boolean;
   @Prop() wordOnly!: boolean;
-  typeWords: TypeWord[] = [];
   clear: boolean = false;
   index = 0;
   key = 0;
   get typeWord() {
-    return this.isWords ? store.state.typeWord.typeWord : store.state.typeWord.typeMeaning;
+    return store.state.typeWord.typeWord;
+  }
+  get typeMeaning() {
+    return store.state.typeWord.typeMeaning;
   }
   get getIsActivated() {
-    return this.isActivated
+    return this.isActivated;
   }
   dispatchTypeWord() {
-    if (this.isWords) {
-      store.dispatch(TYPES.SHIFT_TYPEWORD, this.typeWords[this.index]);
-    } else {
-      store.dispatch(TYPES.SHIFT_TYPEMEANING, this.typeWords[this.index]);
-    }
+    store.dispatch(TYPES.SHIFT_TYPEWORD, this.words[this.index].word);
+    store.dispatch(TYPES.SHIFT_TYPEMEANING, this.words[this.index].meaning);
   }
   mounted() {
+    console.log(this.width);
     window.addEventListener('resize', this.handleResize);
-    if (!this.width) {
+    if (this.width === 0) {
       this.handleResize();
     }
-    this.dispatchTypeWord();
     window.addEventListener('keydown', e => {
       if (store.state.gameCleared) {
         this.keyDown(e.key);
@@ -132,8 +115,9 @@ export default class TypingWordCard extends mixins(UtilMixin) {
   @Watch('words')
   updateWords(newWords: Word[]) {
     Promise.resolve()
-      .then(() => (this.createTypeWords(this.isWords)))
-      .finally(() => (this.dispatchTypeWord()));
+      .then(() => {
+        this.dispatchTypeWord();
+      });
   }
   handleResize() {
     const typingWordCard = document.getElementById(
@@ -142,9 +126,9 @@ export default class TypingWordCard extends mixins(UtilMixin) {
     if (typingWordCard) {
       const typingWordCardWidth = typingWordCard.getBoundingClientRect().width;
       if (typingWordCardWidth > 1000) {
-        this.width = 1000;
+        this.$emit('updateWidth', 1000);
       } else {
-        this.width = typingWordCardWidth - (typingWordCardWidth / 9);
+        this.$emit('updateWidth', typingWordCardWidth - (typingWordCardWidth / 9));
       }
     }
   }
@@ -159,7 +143,7 @@ export default class TypingWordCard extends mixins(UtilMixin) {
   }
   shiftIndex() {
     this.index += 1;
-    if (this.index === this.typeWords.length) {
+    if (this.index === this.words.length) {
       this.clear = true;
       store.dispatch(TYPES.SWITCH_CLEARED, true);
     } else {
@@ -167,9 +151,9 @@ export default class TypingWordCard extends mixins(UtilMixin) {
     }
   }
   shuffle(randomNum: number) {
-    for (var i = this.typeWords.length; i > 1; i--) {
+    for (var i = this.words.length; i > 1; i--) {
       var k = Math.floor(randomNum * i);
-      [this.typeWords[k], this.typeWords[i - 1]] = [this.typeWords[i - 1], this.typeWords[k]];
+      [this.words[k], this.words[i - 1]] = [this.words[i - 1], this.words[k]];
     }
     this.reset();
   }
@@ -180,112 +164,6 @@ export default class TypingWordCard extends mixins(UtilMixin) {
     this.dispatchTypeWord();
     this.key = this.key ? 0 : 1;
   }
-  // Wordsでfor文を作成
-  // Yomiがあるか、ないか判定 -> アルファベットのみの場合変換の必要がない
-  // Yomiがない場合、Stringの二次元配列に変換してtypeWordsにpush
-  // Yomiがある場合、まずparseして細かいひらがなの配列に変換
-  // その後typing用のアルファベットに変換し、typeWordsにpush
-  createTypeWords(isWords: boolean) {
-    for (var i = 0; i < this.words.length; i++) {
-      var word = isWords ? this.words[i].word : this.words[i].meaning;
-      var yomi = isWords ? this.words[i].yomi : this.words[i].mYomi;
-      var tw: string[][] = [];
-      if (!yomi) {
-        var letters = word.split('');
-        for (var j = 0; j < letters.length; j++) {
-          tw[j] = [];
-          tw[j].push(letters[j]);
-        }
-      } else {
-        var parsedSentence = this.parseKanaSentence(yomi);
-        var typingSentence = this.convertToTypingSentences(parsedSentence);
-        tw = typingSentence;
-      }
-      var typeWord = new TypeWord(word, yomi, tw)
-      this.typeWords.push(typeWord);
-    }
-    console.log(this.typeWords);
-  }
-  parseKanaSentence(str: string) {
-    var res: string[] = [];
-    var i = 0;
-    var uni, bi: string;
-    while (i < str.length) {
-      uni = str[i].toString();
-      if (i + 1 < str.length) {
-        bi = str[i].toString() + str[i + 1].toString();
-      } else {
-        bi = '';
-      }
-      if (mp[bi]) {
-        i += 2;
-        res.push(bi);
-      } else {
-        i++;
-        res.push(uni);
-      }
-    }
-    return res;
-  }
-  convertToTypingSentences(str: string[]) {
-    var res: string[][] = [];
-    var s, ns;
-    for (var i = 0; i < str.length; i++) {
-      s = str[i];
-      if (i + 1 < str.length) {
-        ns = str[i + 1];
-      } else {
-        ns = '';
-      }
-      var tmpList: string[] = [];
-      if (s === 'ん') {
-        var isValidSingleN: boolean;
-        var nList = mp[s];
-        if (str.length - 1 === i) {
-          isValidSingleN = false;
-        } else if (i + 1 < str.length && (
-            ns === 'あ' || ns === 'い' || ns === 'う' || ns === 'え' || ns === 'お' ||
-            ns === 'な' || ns === 'に' || ns === 'ぬ' || ns === 'ね' || ns === 'の' ||
-            ns === 'や' || ns === 'ゆ' || ns === 'よ'
-        )) {
-          isValidSingleN = false;
-        } else {
-          isValidSingleN = true;
-        }
-        for (var t of nList) {
-          if (!isValidSingleN && t === 'n') {
-            continue;
-          }
-          tmpList.push(t);
-        }
-      } else if (s === 'っ') {
-        var ltuList = mp[s];
-        var nextList = mp[ns];
-        var hs: string[] = [];
-        for (var v of nextList) {
-          hs.push(v[0]);
-        }
-        var ltuTypeList = hs.concat(ltuList);
-        tmpList = ltuTypeList;
-      } else if (s.length === 2 && s[0] !== 'ん') {
-        tmpList = tmpList.concat(mp[s])
-        var fstList = mp[s[0]];
-        var sndList = mp[s[1]];
-        var resList: string[] = [];
-        for (var fstStr of fstList) {
-          for (var sndStr of sndList) {
-            var u = fstStr + sndStr;
-            resList.push(u);
-          }
-        }
-        tmpList = tmpList.concat(resList);
-      } else {
-        tmpList = mp[s];
-      }
-      res.push(tmpList);
-    }
-    return res;
-  }
 }
 </script>
 
@@ -293,5 +171,29 @@ export default class TypingWordCard extends mixins(UtilMixin) {
 @import '@/style.scss';
 .meaning-card {
   transform: rotateY(180deg);
+}
+.flip-card {
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  perspective: 2000px;
+}
+.flipped-card {
+  transform: rotateY(-180deg);
+}
+.flip-card-inner {
+  cursor: pointer;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s;
+  transform-style: preserve-3d;
+}
+.flip-card-front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden !important;
 }
 </style>

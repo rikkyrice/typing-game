@@ -6,7 +6,7 @@
         :class="MdSmXsUtil('py-4', 'py-3', 'py-3')"
         :breadcrumbs="breadcrumbs"
       />
-    </div>ß
+    </div>
     <div class="pa-0" style="width: 100%;">
       <word-content
         :wordList="wordList"

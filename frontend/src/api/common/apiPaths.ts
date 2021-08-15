@@ -28,6 +28,9 @@ const WORD = {
   DELETE: (wordId: string) => `/words/${wordId}`,
   PATCH: (wordId: string) => `/words/${wordId}/remembered`,
 };
+const TYPING = {
+  GET: (wordListId: string) => `/words/wordlist/${wordListId}/typing`,
+}
 
 // scores
 const SCORES = {
@@ -45,6 +48,7 @@ export const API_PATHS = {
   WORDLISTS,
   WORDLIST,
   WORDS,
+  TYPING,
   WORD,
   SCORES,
   SCORE,

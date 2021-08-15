@@ -3,29 +3,16 @@
     <div class="d-flex flex-column">
       <div class="text-center">
         <span
-          class="bold"
-          :class="{
-            'main-mono-color': isActivated || wordOnly,
-            'mono-30-color': !isActivated && !wordOnly,
-          }"
+          class="bold main-mono-color"
           :style="wordFontStyle"
-        >{{ typeWord.word }}</span>
+        >{{ typeWord.name }}</span>
       </div>
-      <!-- <div v-if="typeWord.yomi" class="text-center">
-        <span
-          :class="{
-            'main-mono-color': isActivated,
-            'mono-30-color': !isActivated,
-          }"
-          :style="fontSizeUtil(20, 20, 16)"
-        >{{ typeWord.yomi }}</span>
-      </div> -->
       <v-divider />
       <div class="d-flex justify-center">
         <div class="d-flex flex-wrap">
           <span
             v-for="(cw, i) in clearedWords"
-            :key="i"
+            :key="`cleared-${i}`"
             class="bold mono-30-color"
             :style="typeFontStyle"
           >
@@ -35,17 +22,15 @@
           </span>
           <span
             v-for="(tw, j) in typeWords"
-            :key="j"
+            :key="`typing-${j}`"
           >
             <span
               v-for="(t, k) in tw[0]"
               :key="k"
               :class="{
-                'focused-word': j === nextIndex && k === 0 && isActivated,
-                'main-mono-color': isActivated,
-                'mono-30-color': !isActivated,
+                'focused-word': j === nextIndex && k === 0,
               }"
-              class="bold"
+              class="bold main-mono-color"
               :style="typeFontStyle"
             >
               <span v-if="t !== ' '">{{ t }}</span>
@@ -71,23 +56,23 @@ export default class LwtgTypingGame extends mixins(UtilMixin) {
   @Prop() typeWord!: TypeWord;
   @Prop() isActivated!: boolean;
   @Prop() wordOnly!: boolean;
-  typeWords = JSON.parse(JSON.stringify(this.typeWord.typeWord));
+  typeWords = JSON.parse(JSON.stringify(this.typeWord.types));
   clearedWords: string[] = [];
   typedWord = '';
   nextIndex = 0;
   get wordFontStyle() {
-    return this.typeWord.word.length < 30
+    return this.typeWord.name.length < 30
         ? this.fontSizeUtil(32, 32, 26)
         : this.fontSizeUtil(24, 24, 20);
   }
   get typeFontStyle() {
-    return this.typeWord.word.length < 30
+    return this.typeWord.name.length < 30
         ? this.fontSizeUtil(24, 24, 20)
         : this.fontSizeUtil(16, 16, 10);
   }
   mounted() {
     window.addEventListener('keydown', e => {
-      if (this.isActivated && !store.state.gameCleared) {
+      if (!store.state.gameCleared) {
         this.keyDown(e.key);
       }
     });
@@ -139,7 +124,7 @@ export default class LwtgTypingGame extends mixins(UtilMixin) {
   setTypeWords(newTypeWord: TypeWord) {
     this.clearedWords = [];
     this.nextIndex = 0;
-    this.typeWords = JSON.parse(JSON.stringify(newTypeWord.typeWord));
+    this.typeWords = JSON.parse(JSON.stringify(newTypeWord.types));
   }
 }
 </script>

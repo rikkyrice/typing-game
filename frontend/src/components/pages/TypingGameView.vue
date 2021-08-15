@@ -1,5 +1,5 @@
 <template>
-  <div id="typing-game-view">
+  <div id="typing-game-view" class="lwtg-secondary-bg" style="height: 100%;">
     <!-- パンくずリスト -->
     <div class="px-16 lwtg-white-bg" style="width: 100%;">
       <lwtg-breadcrumbs
@@ -10,7 +10,7 @@
     <div class="pa-0" style="width: 100%;">
       <typing-game-content
         :wordList="wordList"
-        :words="getWords"
+        :typingWords="getTypingWords"
       />
     </div>
     <lwtg-loader :page-loading="true" :loading="false" />
@@ -29,7 +29,7 @@ import TypingGameContent from '@/components/organisms/TypingGameContent.vue';
 import UtilMixin from '@/mixins/utilMixin';
 import { BreadcrumbInfo } from '@/models/types/breadcrumbInfo';
 import { WordList } from '@/models/wordlist';
-import { WordArray, initializedWordArray } from '@/models/word';
+import { TypingWordArray, initializedTypingWordArray } from '@/models/word';
 
 @Component({
   components: {
@@ -41,16 +41,16 @@ import { WordArray, initializedWordArray } from '@/models/word';
 })
 export default class WordListView extends mixins(UtilMixin) {
   wordList: WordList = {} as WordList;
-  wordArray: WordArray = {
+  typingWordArray: TypingWordArray = {
     matched: 0,
-    words: [],
+    typingWords: [],
   }
   wordListLoading = false;
   wordsLoading = false;
-  get getWords() {
-    return this.wordArray.matched !== 0
-      ? this.wordArray.words
-      : initializedWordArray.words
+  get getTypingWords() {
+    return this.typingWordArray.matched !== 0
+      ? this.typingWordArray.typingWords
+      : initializedTypingWordArray.typingWords
   }
   get viewLoading() {
     return (
@@ -60,7 +60,7 @@ export default class WordListView extends mixins(UtilMixin) {
   }
   created() {
     this.fetchGetWordList();
-    this.fetchGetWords();
+    this.fetchGetTypingWords();
   }
   fetchGetWordList() {
     this.wordListLoading = true;
@@ -74,14 +74,14 @@ export default class WordListView extends mixins(UtilMixin) {
       })
       .finally(() => (this.wordListLoading = false));
   }
-  fetchGetWords() {
+  fetchGetTypingWords() {
     this.wordsLoading = true;
-    WordApi.getWords(this.$route.params.wordlistId)
+    WordApi.getTypingWords(this.$route.params.wordlistId)
       .then((data) => {
-        this.wordArray = data;
-        for (var i = this.wordArray.words.length; i > 1; i--) {
+        this.typingWordArray = data;
+        for (var i = this.typingWordArray.typingWords.length; i > 1; i--) {
           var k = Math.floor(Math.random() * i);
-          [this.wordArray.words[k], this.wordArray.words[i - 1]] = [this.wordArray.words[i - 1], this.wordArray.words[k]];
+          [this.typingWordArray.typingWords[k], this.typingWordArray.typingWords[i - 1]] = [this.typingWordArray.typingWords[i - 1], this.typingWordArray.typingWords[k]];
         }
       })
       .finally(() => (this.wordsLoading = false));

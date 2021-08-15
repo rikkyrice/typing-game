@@ -23,7 +23,7 @@ import LwtgBreadcrumbs from '@/components/atoms/LwtgBreadcrumbs.vue';
 import LwtgLoader from '@/components/atoms/LwtgLoader.vue';
 import WordListContent from '@/components/organisms/WordListContent.vue';
 import { BreadcrumbInfo } from '@/models/types/breadcrumbInfo';
-import { WordListArray } from '@/models/wordlist';
+import { WordListSummaryArray } from '@/models/wordlist';
 import store from '@/store';
 import { TYPES } from '@/store/mutation-types';
 
@@ -39,7 +39,7 @@ export default class MyPageView extends mixins(UtilMixin) {
     { label: 'トップ', path: '/' },
     { label: 'My Page', path: '/mypage' },
   ];
-  wordListArray: WordListArray = {
+  wordListArray: WordListSummaryArray = {
     matched: 0,
     wordlists: [],
   }
