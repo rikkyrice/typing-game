@@ -884,6 +884,103 @@ paths:
                 $ref: '#/components/schemas/APIError'
               example:
                 $ref: '#/components/errors/InternalServerError'
+  /words/{word_list_id}/typing:
+    get:
+      tags:
+        - Words
+      summary: タイピング用の単語のリスト
+      description: タイピング用の単語のリストを取得
+      parameters:
+        - in: header
+          name: Authorization
+          description: アクセストークン
+          required: true
+          schema:
+            type: string
+            example: "Bearer 5hNzaWJHmwTWjOF1qm9iZZZSpYf08Mvev9HnMbyPKibwo1S0DT7OLsRnPb2DEtvUI4upJ9McQ44vBhtMDrFJJD261MecV4Fz47U81BnczTssvkORE8KGYYfPejWssL114howsIhdMCM0LSjbsPc5bmklKX1u0KHt5MYGuAg9kpcRSuLprjcDSi2bP4ZeO4Cej5CnlFYiQ3JCzM4SfKUNEyfXvA7ycKnBIbpuLN8dlwyfLVRykQZyHT5Jk1zGlWJXW3F7O3iMCDRBsqOUI14KM1lCkaqgG6Zf7OiBxk3R8xli"
+        - in: header
+          name: X-User-ID
+          description: ユーザーID
+          required: true
+          schema:
+            type: string
+            example: riku
+        - in: header
+          name: Accept
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: header
+          name: Content-type
+          description: レスポンスのコンテンツタイプ
+          required: true
+          schema:
+            type: string
+            example: "application/json"
+        - in: path
+          name: word_list_id
+          description: 単語帳ID
+          required: true
+          schema:
+            type: integer
+            example: 0
+        - in: query
+          name: name
+          description: 単語名
+          schema:
+            type: string
+            example: "organization"
+        - in: query
+          name: is_remembered
+          description: 覚えたかどうかのフラグ
+          schema:
+            type: boolean
+            example: true
+        - in: query
+          name: sort
+          description: ソートキー。未指定時は作成日時が降順でソートされる。
+            ・+created_at(作成日時を昇順でソート)<br>
+            ・-created_at(作成日時を降順でソート)<br>
+          schema:
+            type: string
+            example: "+created_at"
+        - in: query
+          name: offset
+          description: 開始番号。デフォルト0
+          schema:
+            type: integer
+            example: 1
+        - in: query
+          name: limit
+          description: 返却数。デフォルト24、最大100
+          schema:
+            type: integer
+            example: 24
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTypingWords'
+        '400':
+          description: 入力値フォーマット不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/BadRequestError'
+        default:
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                $ref: '#/components/errors/InternalServerError'
   /scores:
     post:
       tags:
@@ -1219,6 +1316,8 @@ components:
         - word_list_id
         - word_list_title
         - explanation
+        - word_count
+        - play_count
         - created_at
         - updated_at
       properties:
@@ -1234,6 +1333,14 @@ components:
           type: string
           description: 説明
           example:
+        word_count:
+          type: integer
+          description: 単語数
+          example: 0
+        play_count:
+          type: integer
+          description: プレイ回数
+          example: 0
         created_at:
           type: timestamp
           description: 作成日時
@@ -1315,6 +1422,95 @@ components:
           type: string
           description: 意味
           example:
+        explanation:
+          type: string
+          description: 説明
+          example:
+        is_remembered:
+          type: boolean
+          description: 覚えたかどうかのフラグ
+          example: true
+        created_at:
+          type: timestamp
+          description: 作成日時
+          example: "2020-10-04 23:18:00"
+        updated_at:
+          type: timestamp
+          description: 更新日時
+          example: "2020-10-04 23:19:00"
+    GetTypingWords:
+      type: object
+      required:
+        - matched
+        - typingWords
+      properties:
+        matched:
+          type: integer
+          description: マッチした単語の数
+          example: 1
+        typingWords:
+          type: array
+          description: タイピング用の単語
+          items:
+            $ref: '#/components/schemas/TypingWord'
+    TypingWord:
+      type: object
+      required:
+        - word
+        - meaning
+        - explanation
+        - is_remembered
+        - created_at
+        - updated_at
+      properties:
+        word:
+          type: object
+          description: 単語
+          required:
+            - name
+            - yomi
+            - types
+          properties:
+            name:
+              type: string
+              description: 単語名
+              example: "organization"
+            yomi:
+              type: string
+              description: 単語読み
+              example: ""
+            types:
+              type: array
+              description: 単語のタイピング用の単語の配列
+              items:
+                type: array
+                items:
+                  type: string
+                  example: s
+        meaning:
+          type: object
+          description: 意味
+          required:
+            - name
+            - yomi
+            - types
+          properties:
+            name:
+              type: string
+              description: 意味名
+              example: 組織、企業
+            yomi:
+              type: string
+              description: 意味読み
+              example: そしき、きぎょう
+            types:
+              type: array
+              description: 単語のタイピング用の単語の配列
+              items:
+                type: array
+                items:
+                  type: string
+                  example: s
         explanation:
           type: string
           description: 説明
