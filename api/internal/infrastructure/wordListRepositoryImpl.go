@@ -6,6 +6,7 @@ import (
 	"api/internal/domain/repository"
 	"database/sql"
 	"net/http"
+	"sort"
 
 	"api/db"
 
@@ -13,11 +14,11 @@ import (
 )
 
 const selectWordListByIDQuery string = `
-	SELECT * FROM wordlists WHERE id = $1
+	SELECT * FROM wordlistsSummaries WHERE id = $1
 `
 
 const selectWordListByUserIDQuery string = `
-	SELECT * FROM wordlists WHERE user_id = $1
+	SELECT * FROM wordlistsSummaries WHERE user_id = $1
 `
 
 const insertWordListQuery string = `
@@ -82,17 +83,17 @@ type wordListRepository struct {
 	deleteWordListByIDPstmt     *sql.Stmt
 }
 
-func (wlR *wordListRepository) FindWordListByID(id string) (*model.WordList, *apierror.Error) {
-	var wl model.WordList
+func (wlR *wordListRepository) FindWordListByID(id string) (*model.WordListSummary, *apierror.Error) {
+	var wl model.WordListSummary
 
-	if err := wlR.selectWordListByIDPstmt.QueryRow(id).Scan(&wl.ID, &wl.UserID, &wl.Title, &wl.Explanation, &wl.CreatedAt, &wl.UpdatedAt); err != nil {
+	if err := wlR.selectWordListByIDPstmt.QueryRow(id).Scan(&wl.ID, &wl.UserID, &wl.Title, &wl.Explanation, &wl.WordCount, &wl.PlayCount, &wl.PlayedAt, &wl.CreatedAt, &wl.UpdatedAt); err != nil {
 		return nil, apierror.NewError(http.StatusNotFound, errors.Wrap(err, "単語帳が見つかりません。"))
 	}
 	return &wl, nil
 }
 
-func (wlR *wordListRepository) FindWordListByUserID(userID string) ([]*model.WordList, *apierror.Error) {
-	wls := []*model.WordList{}
+func (wlR *wordListRepository) FindWordListByUserID(userID string) ([]*model.WordListSummary, *apierror.Error) {
+	wls := []*model.WordListSummary{}
 
 	rows, err := wlR.selectWordListByUserIDPstmt.Query(userID)
 	if err != nil {
@@ -100,12 +101,14 @@ func (wlR *wordListRepository) FindWordListByUserID(userID string) ([]*model.Wor
 	}
 
 	for rows.Next() {
-		var wl model.WordList
-		if err := rows.Scan(&wl.ID, &wl.UserID, &wl.Title, &wl.Explanation, &wl.CreatedAt, &wl.UpdatedAt); err != nil {
+		var wl model.WordListSummary
+		if err := rows.Scan(&wl.ID, &wl.UserID, &wl.Title, &wl.Explanation, &wl.WordCount, &wl.PlayCount, &wl.PlayedAt, &wl.CreatedAt, &wl.UpdatedAt); err != nil {
 			return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "レコードの読み取りに失敗しました。"))
 		}
 		wls = append(wls, &wl)
 	}
+
+	sort.Slice(wls, func(i, j int) bool { return wls[i].CreatedAt.Before(wls[j].CreatedAt) })
 
 	return wls, nil
 }

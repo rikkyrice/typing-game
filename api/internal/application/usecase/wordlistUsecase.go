@@ -12,8 +12,8 @@ import (
 
 // WordListUseCase 単語帳のサービスインターフェース
 type WordListUseCase interface {
-	GetWordLists(userID string) ([]*model.WordList, *apierror.Error)
-	GetWordList(wordListID string) (*model.WordList, *apierror.Error)
+	GetWordLists(userID string) ([]*model.WordListSummary, *apierror.Error)
+	GetWordList(wordListID string) (*model.WordListSummary, *apierror.Error)
 	PostWordList(wordlist model.WordList) (*model.WordList, *apierror.Error)
 	PutWordList(id string, wordlist model.WordList) (*model.WordList, *apierror.Error)
 	DeleteWordList(id string) *apierror.Error
@@ -30,8 +30,8 @@ type wordlistUseCase struct {
 	WordListRepository repository.WordListRepository
 }
 
-func (wl *wordlistUseCase) GetWordLists(userID string) ([]*model.WordList, *apierror.Error) {
-	wordlists := []*model.WordList{}
+func (wl *wordlistUseCase) GetWordLists(userID string) ([]*model.WordListSummary, *apierror.Error) {
+	wordlists := []*model.WordListSummary{}
 	wordlists, err := wl.WordListRepository.FindWordListByUserID(userID)
 	if err != nil {
 		return wordlists, err
@@ -39,7 +39,7 @@ func (wl *wordlistUseCase) GetWordLists(userID string) ([]*model.WordList, *apie
 	return wordlists, nil
 }
 
-func (wl *wordlistUseCase) GetWordList(wordListID string) (*model.WordList, *apierror.Error) {
+func (wl *wordlistUseCase) GetWordList(wordListID string) (*model.WordListSummary, *apierror.Error) {
 	wordlist, err := wl.WordListRepository.FindWordListByID(wordListID)
 	if err != nil {
 		return wordlist, err

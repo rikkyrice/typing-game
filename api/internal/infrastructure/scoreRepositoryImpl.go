@@ -25,7 +25,7 @@ const selectLatestScoreByWordListIDQuery string = `
 
 const insertScoreQuery string = `
 	INSERT INTO scores
-	VALUES($1,$2,$3,$4,$5,$6)
+	VALUES($1,$2,$3,$4,$5)
 `
 
 const deleteScoreByIDQuery string = `
@@ -90,7 +90,7 @@ func (sR *scoreRepository) FindScoreByWordListID(wlID string) ([]*model.Score, *
 
 	for rows.Next() {
 		var s model.Score
-		if err := rows.Scan(&s.ID, &s.WordListID, &s.PlayCount, &s.ClearTypeCount, &s.MissTypeCount, &s.PlayedAt); err != nil {
+		if err := rows.Scan(&s.ID, &s.WordListID, &s.ClearTypeCount, &s.MissTypeCount, &s.PlayedAt); err != nil {
 			return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "レコードの読み取りに失敗しました。"))
 		}
 		ss = append(ss, &s)
@@ -102,21 +102,20 @@ func (sR *scoreRepository) FindScoreByWordListID(wlID string) ([]*model.Score, *
 func (sR *scoreRepository) FIndLatestScoreByWordListID(wlID string) (*model.Score, *apierror.Error) {
 	var s model.Score
 
-	if err := sR.selectLatestScoreByWordListIDPstmt.QueryRow(wlID).Scan(&s.ID, &s.WordListID, &s.PlayCount, &s.ClearTypeCount, &s.MissTypeCount, &s.PlayedAt); err != nil {
+	if err := sR.selectLatestScoreByWordListIDPstmt.QueryRow(wlID).Scan(&s.ID, &s.WordListID, &s.ClearTypeCount, &s.MissTypeCount, &s.PlayedAt); err != nil {
 		return nil, apierror.NewError(http.StatusNotFound, errors.Wrapf(err, "ID[%s]の単語帳の最新のスコアが見つかりません。", wlID))
 	}
 	return &s, nil
 }
 
 func (sR *scoreRepository) CreateScore(s model.Score) (*model.Score, *apierror.Error) {
-	_, err := sR.insertScorePstmt.Exec(&s.ID, &s.WordListID, &s.PlayCount, &s.ClearTypeCount, &s.MissTypeCount, &s.PlayedAt)
+	_, err := sR.insertScorePstmt.Exec(&s.ID, &s.WordListID, &s.ClearTypeCount, &s.MissTypeCount, &s.PlayedAt)
 	if err != nil {
 		return nil, apierror.NewError(http.StatusInternalServerError, errors.Wrap(err, "スコアの作成に失敗しました。"))
 	}
 	return &model.Score{
 		ID:             s.ID,
 		WordListID:     s.WordListID,
-		PlayCount:      s.PlayCount,
 		ClearTypeCount: s.ClearTypeCount,
 		MissTypeCount:  s.MissTypeCount,
 		PlayedAt:       s.PlayedAt,

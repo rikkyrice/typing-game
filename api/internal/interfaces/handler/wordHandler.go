@@ -18,6 +18,7 @@ type WordHandler interface {
 	PUTWord() echo.HandlerFunc
 	DELETEWord() echo.HandlerFunc
 	DELETEWords() echo.HandlerFunc
+	GETTypingWords() echo.HandlerFunc
 }
 
 // NewWordHandler 単語ハンドラ生成
@@ -264,5 +265,39 @@ func (w *wordHandler) DELETEWords() echo.HandlerFunc {
 			return c.JSON(err.StatusCode, err)
 		}
 		return c.NoContent(http.StatusNoContent)
+	}
+}
+
+type typingWordsResponse struct {
+	Matched     int                   `json:"matched"`
+	TypingWords []*typingWordResponse `json:"typingWords"`
+}
+
+func (w *wordHandler) GETTypingWords() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		_, err := usecase.Authenticate(c)
+		if err != nil {
+			return c.JSON(err.StatusCode, err)
+		}
+		c.Echo().Logger.Info("認証OK")
+		pathParams, err := getPathParams(c)
+		if err != nil {
+			c.Echo().Logger.Errorf("パスパラメータの読み込みに失敗しました。%+v", err)
+			return c.JSON(err.StatusCode, err)
+		}
+
+		words, err := w.WordUseCase.GetWordByWordListID(pathParams.ID)
+		if err != nil {
+			return c.JSON(err.StatusCode, err)
+		}
+		tws := []*typingWordResponse{}
+		for _, word := range words {
+			tws = append(tws, toTypingWordResponse(word))
+		}
+		res := &typingWordsResponse{
+			Matched:     len(words),
+			TypingWords: tws,
+		}
+		return c.JSON(http.StatusOK, res)
 	}
 }

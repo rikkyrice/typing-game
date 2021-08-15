@@ -55,6 +55,7 @@ func (r *Router) Init(rg *registry.Registry) {
 	r.Router.PUT(wordpath+"/:id", rg.WordH.PUTWord())
 	r.Router.DELETE(wordpath+"/:id", rg.WordH.DELETEWord())
 	r.Router.DELETE(wordpath+"/wordlist/:id", rg.WordH.DELETEWords())
+	r.Router.GET(wordpath+"/wordlist/:id/typing", rg.WordH.GETTypingWords())
 
 	r.Router.GET(scorepath+"/:id", rg.ScoreH.GETScores())
 	r.Router.GET(scorepath+"/:id/latest", rg.ScoreH.GETLatestScore())

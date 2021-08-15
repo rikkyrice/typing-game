@@ -72,7 +72,6 @@ type scoreResponse struct {
 func toScoreResponse(score *model.Score) *scoreResponse {
 	return &scoreResponse{
 		ID:             score.ID,
-		PlayCount:      score.PlayCount,
 		ClearTypeCount: score.ClearTypeCount,
 		MissTypeCount:  score.MissTypeCount,
 		PlayedAt:       score.PlayedAt,
@@ -113,7 +112,6 @@ func (sR *scoreQueryRequest) toScore() model.Score {
 	return model.Score{
 		ID:             "",
 		WordListID:     sR.WordListID,
-		PlayCount:      sR.PlayCount,
 		ClearTypeCount: sR.ClearTypeCount,
 		MissTypeCount:  sR.MissTypeCount,
 		PlayedAt:       sR.PlayedAt,

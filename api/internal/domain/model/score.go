@@ -8,8 +8,6 @@ type Score struct {
 	ID string `json:"id" validate:"required"`
 	// WordListID 単語帳ID
 	WordListID string `json:"wordlistID" validate:"required"`
-	// PlayCount プレイ回数
-	PlayCount int `json:"playCount" validate:"required"`
 	// ClearTypeCount クリアタイプ数
 	ClearTypeCount int `json:"clearTypeCount" validate:"required"`
 	// MissTypeCount ミスタイプ数

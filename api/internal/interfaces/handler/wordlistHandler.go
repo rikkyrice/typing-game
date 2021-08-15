@@ -29,6 +29,39 @@ type wordlistHandler struct {
 	WordListUseCase usecase.WordListUseCase
 }
 
+type wordlistSummaryResponse struct {
+	ID          string    `json:"id"`
+	Title       string    `json:"title"`
+	Explanation string    `json:"explanation"`
+	WordCount   int       `json:"wordCount"`
+	PlayCount   int       `json:"playCount"`
+	PlayedAt    string    `json:"playedAt"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
+func toWordlistSummaryResponse(wordlist *model.WordListSummary) *wordlistSummaryResponse {
+	var playedAt string = "-"
+	if wordlist.PlayedAt.Valid {
+		playedAt = wordlist.PlayedAt.Time.Format("2006/01/02 15:04:05")
+	}
+	return &wordlistSummaryResponse{
+		ID:          wordlist.ID,
+		Title:       wordlist.Title,
+		Explanation: wordlist.Explanation,
+		WordCount:   wordlist.WordCount,
+		PlayCount:   wordlist.PlayCount,
+		PlayedAt:    playedAt,
+		CreatedAt:   wordlist.CreatedAt,
+		UpdatedAt:   wordlist.UpdatedAt,
+	}
+}
+
+type wordlistsSummaryResponse struct {
+	Matched   int                        `json:"matched"`
+	WordLists []*wordlistSummaryResponse `json:"wordlists"`
+}
+
 type wordlistResponse struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
@@ -64,11 +97,11 @@ func (wl *wordlistHandler) GETWordLists() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
-		wls := []*wordlistResponse{}
+		wls := []*wordlistSummaryResponse{}
 		for _, wordlist := range wordlists {
-			wls = append(wls, toWordlistResponse(wordlist))
+			wls = append(wls, toWordlistSummaryResponse(wordlist))
 		}
-		res := &wordlistsResponse{
+		res := &wordlistsSummaryResponse{
 			Matched:   len(wordlists),
 			WordLists: wls,
 		}
@@ -93,7 +126,7 @@ func (wl *wordlistHandler) GETWordList() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(err.StatusCode, err)
 		}
-		res := toWordlistResponse(wordlist)
+		res := toWordlistSummaryResponse(wordlist)
 		return c.JSON(http.StatusOK, res)
 	}
 }
