@@ -64,7 +64,7 @@ func Testユーザー登録(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -99,7 +99,7 @@ func Testユーザー登録ID重複(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -133,7 +133,7 @@ func Testログイン(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -182,7 +182,7 @@ func Testログイン時ユーザーが見つからない(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -232,7 +232,7 @@ func Testログイン時パスワード違い(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -282,7 +282,7 @@ func Test単語帳作成(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -370,7 +370,7 @@ func Test単語帳取得(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -458,7 +458,7 @@ func Test単語帳更新(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -558,7 +558,7 @@ func Test単語帳更新ID不一致(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -631,7 +631,7 @@ func Test単語帳削除(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -712,7 +712,7 @@ func Test単語帳削除ID不一致(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -791,7 +791,7 @@ func Test単語作成(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -886,7 +886,7 @@ func Test単語作成単語帳IDが存在しない(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -966,7 +966,7 @@ func Test単語作成複数(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -1078,7 +1078,7 @@ func Test単語取得(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -1172,7 +1172,7 @@ func Test単語取得ID不一致(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -1252,7 +1252,7 @@ func Test単語取得複数(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -1369,7 +1369,7 @@ func Test単語取得複数単語帳IDが存在しない(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -1470,7 +1470,7 @@ func Test単語更新(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -1574,7 +1574,7 @@ func Test単語更新ID不一致(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -1665,7 +1665,7 @@ func Test単語削除(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -1747,7 +1747,7 @@ func Test単語削除ID不一致(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -1827,7 +1827,7 @@ func Test単語削除単語帳の削除(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -1922,7 +1922,7 @@ func Test単語削除単語帳IDが見つからない(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -2018,7 +2018,7 @@ func Testスコア作成(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -2066,10 +2066,8 @@ func Testスコア作成(t *testing.T) {
 	s := &model.Score{
 		ID:             "",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
-		PlayCount:      1,
 		ClearTypeCount: 140,
 		MissTypeCount:  40,
-		CorrectRate:    0.95,
 		PlayedAt:       time.Now(),
 	}
 	sJSON, err := json.Marshal(s)
@@ -2107,7 +2105,7 @@ func Testスコア取得(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -2155,10 +2153,8 @@ func Testスコア取得(t *testing.T) {
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
-		PlayCount:      1,
 		ClearTypeCount: 140,
 		MissTypeCount:  40,
-		CorrectRate:    0.95,
 		PlayedAt:       time.Now(),
 	}
 	rg.ScoreR.CreateScore(s)
@@ -2184,10 +2180,8 @@ func Testスコア取得(t *testing.T) {
 	assert.Equal(t, 2, ssRes.Matched)
 	assert.Equal(t, s.ID, ssRes.Scores[len(ssRes.Scores)-1].ID)
 	assert.Equal(t, s.WordListID, ssRes.Scores[len(ssRes.Scores)-1].WordListID)
-	assert.Equal(t, s.PlayCount, ssRes.Scores[len(ssRes.Scores)-1].PlayCount)
 	assert.Equal(t, s.ClearTypeCount, ssRes.Scores[len(ssRes.Scores)-1].ClearTypeCount)
 	assert.Equal(t, s.MissTypeCount, ssRes.Scores[len(ssRes.Scores)-1].MissTypeCount)
-	assert.Equal(t, s.CorrectRate, ssRes.Scores[len(ssRes.Scores)-1].CorrectRate)
 	assert.Equal(t, s.PlayedAt.Format(time.RFC3339), ssRes.Scores[len(ssRes.Scores)-1].PlayedAt.Format(time.RFC3339))
 }
 
@@ -2202,7 +2196,7 @@ func Testスコア取得単語帳IDが存在しない(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -2250,10 +2244,8 @@ func Testスコア取得単語帳IDが存在しない(t *testing.T) {
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
-		PlayCount:      1,
 		ClearTypeCount: 140,
 		MissTypeCount:  40,
-		CorrectRate:    0.95,
 		PlayedAt:       time.Now(),
 	}
 	rg.ScoreR.CreateScore(s)
@@ -2291,7 +2283,7 @@ func Test最新スコア取得(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -2339,10 +2331,8 @@ func Test最新スコア取得(t *testing.T) {
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
-		PlayCount:      1,
 		ClearTypeCount: 140,
 		MissTypeCount:  40,
-		CorrectRate:    0.95,
 		PlayedAt:       time.Now(),
 	}
 	rg.ScoreR.CreateScore(s)
@@ -2367,10 +2357,8 @@ func Test最新スコア取得(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec2.Code)
 	assert.Equal(t, s.ID, sRes.Score.ID)
 	assert.Equal(t, s.WordListID, sRes.Score.WordListID)
-	assert.Equal(t, s.PlayCount, sRes.Score.PlayCount)
 	assert.Equal(t, s.ClearTypeCount, sRes.Score.ClearTypeCount)
 	assert.Equal(t, s.MissTypeCount, sRes.Score.MissTypeCount)
-	assert.Equal(t, s.CorrectRate, sRes.Score.CorrectRate)
 	assert.Equal(t, s.PlayedAt.Format(time.RFC3339), sRes.Score.PlayedAt.Format(time.RFC3339))
 }
 
@@ -2385,7 +2373,7 @@ func Test最新スコア取得単語帳IDが存在しない(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -2433,10 +2421,8 @@ func Test最新スコア取得単語帳IDが存在しない(t *testing.T) {
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
-		PlayCount:      1,
 		ClearTypeCount: 140,
 		MissTypeCount:  40,
-		CorrectRate:    0.95,
 		PlayedAt:       time.Now(),
 	}
 	rg.ScoreR.CreateScore(s)
@@ -2465,7 +2451,7 @@ func Testスコア削除(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -2525,10 +2511,8 @@ func Testスコア削除(t *testing.T) {
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "bb8938cb-0289-4ed4-9b5e-408d309739ad",
-		PlayCount:      1,
 		ClearTypeCount: 140,
 		MissTypeCount:  40,
-		CorrectRate:    0.95,
 		PlayedAt:       time.Now(),
 	}
 	rg.ScoreR.CreateScore(s)
@@ -2559,7 +2543,7 @@ func Testスコア削除単語帳IDが存在しない(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -2619,10 +2603,8 @@ func Testスコア削除単語帳IDが存在しない(t *testing.T) {
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "bb8938cb-0289-4ed4-9b5e-408d309739ad",
-		PlayCount:      1,
 		ClearTypeCount: 140,
 		MissTypeCount:  40,
-		CorrectRate:    0.95,
 		PlayedAt:       time.Now(),
 	}
 	rg.ScoreR.CreateScore(s)
@@ -2655,7 +2637,7 @@ func Test単語がある状態の単語帳を削除(t *testing.T) {
 		fmt.Printf("DBとの接続に失敗しました。%+v", err)
 	}
 	defer conn.Close()
-	rg := registry.NewRegistry(conn)
+	rg, _ := registry.NewRegistry(conn)
 	r := router.NewRouter()
 	r.Init(rg)
 
@@ -2728,10 +2710,8 @@ func Test単語がある状態の単語帳を削除(t *testing.T) {
 	s := model.Score{
 		ID:             "score28c-0289-4ed4-9b5e-408d309739ad",
 		WordListID:     "5f52039d-d983-4ebd-90b2-e3e04f821896",
-		PlayCount:      1,
 		ClearTypeCount: 140,
 		MissTypeCount:  40,
-		CorrectRate:    0.95,
 		PlayedAt:       time.Now(),
 	}
 	rg.ScoreR.CreateScore(s)
